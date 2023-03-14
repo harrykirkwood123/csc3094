@@ -1,5 +1,6 @@
 const loginAccountApi = require('../../api/auth/login');
 const logoutAccountApi = require('../../api/auth/logout');
+const createAccountApi = require('../../api/auth/newUser');
 
 class AuthApiController {
 
