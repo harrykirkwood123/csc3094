@@ -21,8 +21,10 @@ const app = express();
 app.use(cors());
 
 const auth_router = require('./src/controllers/auth/authRouter')
+const jobs_router = require('./src/controllers/jobs/jobsRouter')
 
 app.use('/', auth_router)
+app.use('/', jobs_router)
 
 app.use(bodyParser.json());
 
