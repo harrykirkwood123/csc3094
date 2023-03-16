@@ -13,10 +13,8 @@ admin.initializeApp({
 
 async function loginAccount(email, password) {
     try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        // const customToken = await admin.auth().createCustomToken(cred.user.uid);
-        const currentUser = auth.currentUser;
-        const customToken = await getIdToken(currentUser);
+        await signInWithEmailAndPassword(auth, email, password);
+        const customToken = await getIdToken(auth.currentUser);
         return customToken;
     } catch (error) {
         // Handle Errors here.

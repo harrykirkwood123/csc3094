@@ -23,6 +23,16 @@ class JobsApiController {
             })
     }
 
+    editJob(req, res) {
+        editJobApi(req.body, req.authId)
+            .then(uid => {
+                res.status(200).send(uid)
+            })
+            .catch(err => {
+                res.status(400).send(err)
+            })
+    }
+
 }
 
 module.exports = new JobsApiController()

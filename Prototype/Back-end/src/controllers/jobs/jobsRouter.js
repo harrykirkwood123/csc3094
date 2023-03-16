@@ -8,12 +8,8 @@ jobs_router.use(bodyParser.json());
 
 const jobsApiController = require('./jobsApiController');
 
-
-
 jobs_router.post('/jobs/createjob', authenticate_token, jobsApiController['createJob']);
 jobs_router.post('/jobs/deletejob', authenticate_token, jobsApiController['deleteJob']);
-// jobs_router.get('/auth/logout', authApiController['logoutAccount']);
-// jobs_router.post('/auth/createaccount', authApiController['createAccount']);
-
+jobs_router.post('/jobs/editjob', authenticate_token, jobsApiController['editJob']);
 
 module.exports = jobs_router;
