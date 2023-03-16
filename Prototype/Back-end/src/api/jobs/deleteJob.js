@@ -1,18 +1,15 @@
-const { getFirestore, doc, setDoc } = require("firebase/firestore");
+const { getFirestore, collection, deleteDoc, doc } = require("firebase/firestore");
 
 const db = getFirestore();
 
-async function deleteJob(job) {
+async function deleteJob(jobId, uid) {
     try {
-        await setDoc(doc(db, "Jobs", cred.user.uid), {
-            title: job.title,
-            timeManagement: job.timeManagement,
-            due: job.due,
-            timeToComplete: job.timeToComplete,
-            priority: job.priority
-        });
+        const jobsDocRef = doc(db, "Jobs", uid);
+        const jobsColRef = collection(jobsDocRef, "Jobs")
+        await deleteDoc(doc(jobsColRef, jobId));
 
     } catch (error) {
+        console.log(error);
         throw new Error(error);
     }
 }

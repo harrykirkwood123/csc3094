@@ -13,6 +13,16 @@ class JobsApiController {
             })
     }
 
+    deleteJob(req, res) {
+        deleteJobApi(req.body.jobId, req.authId)
+            .then(uid => {
+                res.status(200).send(uid)
+            })
+            .catch(err => {
+                res.status(400).send(err)
+            })
+    }
+
 }
 
 module.exports = new JobsApiController()
