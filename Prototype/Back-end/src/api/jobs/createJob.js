@@ -11,7 +11,8 @@ async function createJob(job, uid) {
             timeManagement: job.timeManagement,
             due: job.due,
             timeToComplete: job.timeToComplete,
-            priority: job.priority
+            priority: job.priority,
+            completed: false
         });
 
     } catch (error) {

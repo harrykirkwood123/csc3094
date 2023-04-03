@@ -11,5 +11,6 @@ const jobsApiController = require('./jobsApiController');
 jobs_router.post('/jobs/createjob', authenticate_token, jobsApiController['createJob']);
 jobs_router.post('/jobs/deletejob', authenticate_token, jobsApiController['deleteJob']);
 jobs_router.post('/jobs/editjob', authenticate_token, jobsApiController['editJob']);
+jobs_router.post('/jobs/markcompleted', authenticate_token, jobsApiController['markCompleted']);
 
 module.exports = jobs_router;
