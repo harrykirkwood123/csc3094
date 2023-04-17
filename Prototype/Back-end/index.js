@@ -21,10 +21,10 @@ const app = express();
 app.use(cors());
 
 const auth_router = require('./src/controllers/auth/authRouter')
-const jobs_router = require('./src/controllers/jobs/jobsRouter')
+const tasks_router = require('./src/controllers/tasks/tasksRouter')
 
 app.use('/', auth_router)
-app.use('/', jobs_router)
+app.use('/', tasks_router)
 
 app.use(bodyParser.json());
 

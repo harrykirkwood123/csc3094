@@ -1,11 +1,11 @@
-const createJobApi = require('../../api/jobs/createJob');
-const deleteJobApi = require('../../api/jobs/deleteJob');
-const editJobApi = require('../../api/jobs/editJob');
-const markCompletedApi = require('../../api/jobs/markCompleted');
+const createTaskApi = require('../../api/tasks/createTask');
+const deleteTaskApi = require('../../api/tasks/deleteTask');
+const editTaskApi = require('../../api/tasks/editTask');
+const markCompletedApi = require('../../api/tasks/markCompleted');
 
-class JobsApiController {
-    createJob(req, res) {
-        createJobApi(req.body, req.authId)
+class TasksApiController {
+    createTask(req, res) {
+        createTaskApi(req.body, req.authId)
             .then(uid => {
                 res.status(200).send(uid)
             })
@@ -14,8 +14,8 @@ class JobsApiController {
             })
     }
 
-    deleteJob(req, res) {
-        deleteJobApi(req.body.jobId, req.authId)
+    deleteTask(req, res) {
+        deleteTaskApi(req.body.jobId, req.authId)
             .then(uid => {
                 res.status(200).send(uid)
             })
@@ -24,8 +24,8 @@ class JobsApiController {
             })
     }
 
-    editJob(req, res) {
-        editJobApi(req.body, req.authId)
+    editTask(req, res) {
+        editTaskApi(req.body, req.authId)
             .then(uid => {
                 res.status(200).send(uid)
             })
@@ -46,4 +46,4 @@ class JobsApiController {
 
 }
 
-module.exports = new JobsApiController()
+module.exports = new TasksApiController()
