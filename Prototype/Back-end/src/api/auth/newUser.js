@@ -10,9 +10,7 @@ async function createAccount(newUser) {
         const cred = await createUserWithEmailAndPassword(auth, newUser.email, newUser.password);
 
         await setDoc(doc(db, "AccountInformation", cred.user.uid), {
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
-            university: newUser.university,
+            firstName: newUser.firstName
         });
 
         await setDoc(doc(db, "UserPreferences", cred.user.uid), {

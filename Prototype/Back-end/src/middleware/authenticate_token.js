@@ -29,7 +29,10 @@ module.exports = (req, res, next) => {
             req.authId = userInfo.uid;
             return next();
         } catch (e) {
-            return res.status(401).send({ error: 'You are not authorized to make this request' });
+            return res.status(401).send(
+                {
+                    error: 'You are not authorized to make this request'
+                });
         }
     });
 }
