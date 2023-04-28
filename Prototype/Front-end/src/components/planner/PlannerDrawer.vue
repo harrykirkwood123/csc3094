@@ -1,12 +1,21 @@
 <template>
   <v-cupertino id="2" :drawerOptions="options" ref="plannerDrawer">
-<!--    <div>-->
-<!--      <task-list-item v-for="task in localTasks" :key="task.id" :task="task"></task-list-item>-->
-<!--    </div>-->
-    <draggable :list="tasks" group="tasks" itemKey="id" @start="handleDrag" @end="handleDrop">
-<!--      <draggable :list="list1" group="tasks" itemKey="id" :move="rejectDrag">-->
+    <draggable ghost-class="ghostdrop"
+               :list="tasks"
+               group="tasks"
+               itemKey="2"
+               class="list-group"
+               :component-data="{
+                          tag: 'div',
+                          name: 'flip-list',
+                          type: 'transition',
+                       }"
+               v-bind="dragOptions"
+               @start="handleDrag"
+               @end="handleDrop"
+               :move="checkFull">
       <template #item="{ element }">
-        <ion-card>
+        <ion-card v-if="element.startTime == null">
           <ion-card-content>
             <ion-grid>
               <ion-row>
@@ -59,27 +68,16 @@ export default defineComponent ({
   props: {
     tasks: Array
   },
-  data() {
-    return {
-      localTasks: [],
-      list1: [
-        {
-          id: 1,
-          name: "Harry",
-          duration: "5m"
-        },
-        {
-          id: 2,
-          name: "Thomas",
-          duration: "2m"
-        }
-      ]
-    }
-  },
-  created() {
-    this.fetchDocuments();
-  },
   computed: {
+    dragOptions() {
+      return {
+        animation: 200,
+        group: "tasks",
+        disabled: false,
+        ghostClass: "ghostdrop"
+      };
+    },
+
     priorityColour: function() {
       if (this.task.priority === "High") {
         return 'priority-high'
@@ -91,6 +89,10 @@ export default defineComponent ({
     }
   },
   methods: {
+    checkFull: function(evt) {
+      return (evt.relatedContext.list.length !== 1)
+    },
+
     duration: function (duration) {
       // Calculate hours and minutes
       const hours = Math.floor(duration / 3600);
@@ -112,35 +114,17 @@ export default defineComponent ({
 
       return formattedDuration;
     },
-
-    async fetchDocuments() {
-      const collectionRef = collection(db, 'Tasks', auth.currentUser.uid, 'Tasks');
-      const q = query(collectionRef);
-
-      onSnapshot(q, (querySnapshot) => {
-        // Reset the local array
-        this.localTasks = [];
-
-        // Fill the local array with the fetched documents
-        querySnapshot.forEach((doc) => {
-          this.localTasks.push({
-            id: doc.id,
-            ...doc.data(),
-          });
-        });
-      });
-    },
   },
   setup() {
     const plannerDrawer: Ref<typeof VCupertino> = ref(VCupertino);
 
     const options = {
+      animationDuration: 500,
       topperOverflow: true,
       draggableOver: false,
-      preventClicks: false,
+      preventClicks: true,
       preventScroll: false,
-      simulateTouch: false,
-      dragBy: ['.pane .draggable'],
+      simulateTouch: true,
       topperOverflowOffset: 50,
       buttonClose: false,
       bottomClose: false,
@@ -155,7 +139,7 @@ export default defineComponent ({
         middle: {
           enabled: true,
           height: 100,
-          bounce: false
+          bounce: true
         },
         bottom: {
           enabled: false
@@ -166,13 +150,16 @@ export default defineComponent ({
     function handleDrag() {
       const cupertino = plannerDrawer.value.cupertino as CupertinoPane;
 
+
       cupertino.moveToBreak("middle")
+      // cupertino.destroy();
     }
 
     function handleDrop() {
       const cupertino = plannerDrawer.value.cupertino as CupertinoPane;
 
-      cupertino.moveToBreak("top")
+      // cupertino.present();
+      cupertino.moveToBreak("top");
     }
 
 
@@ -188,6 +175,22 @@ export default defineComponent ({
 </script>
 
 <style>
+.list-group {
+  min-height: 50px;
+}
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+
+.no-move {
+  transition: transform 0s;
+}
+
+.ghostdrop {
+  background-color: #f5f6f9;
+}
+
 .priority-high {
   background: #F76868;
 }

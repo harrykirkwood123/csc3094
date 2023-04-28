@@ -15,7 +15,7 @@
         </ion-item>
       </ion-list>
 
-      <ion-button expand="block" slot="bottom" @click="destroyDrawer">Submit</ion-button>
+      <ion-button expand="block" slot="bottom" @click="callCreateTask">Submit</ion-button>
     </div>
   </v-cupertino>
 </template>
@@ -50,6 +50,7 @@ export default defineComponent ({
       const { createTask } = api();
 
       await createTask(this.payload)
+      this.destroyDrawer()
     }
   },
   setup() {
@@ -57,7 +58,7 @@ export default defineComponent ({
 
     const destroyDrawer = () => {
       const cupertino = bottomSheet.value.cupertino as CupertinoPane;
-      cupertino.destroy()
+      cupertino.moveToBreak("middle");
     }
 
     const options = {

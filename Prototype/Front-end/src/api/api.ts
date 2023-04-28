@@ -86,10 +86,38 @@ export default function api() {
         }
     }
 
+    const setStartTime = async (payload) => {
+        const auth = getAuth();
+        const token = await getIdToken(auth.currentUser)
+
+        try {
+            await axios.post(host + '/planner/setstarttime/', payload, {headers:
+                    { authorization: `Bearer ${token}` }})
+        }
+        catch (e) {
+            await errorHandler(e)
+        }
+    }
+
+    const removeStartTime = async (payload) => {
+        const auth = getAuth();
+        const token = await getIdToken(auth.currentUser)
+
+        try {
+            await axios.post(host + '/planner/removestarttime/', payload, {headers:
+                    { authorization: `Bearer ${token}` }})
+        }
+        catch (e) {
+            await errorHandler(e)
+        }
+    }
+
 
     return {
         signUp,
         login,
-        createTask
+        createTask,
+        setStartTime,
+        removeStartTime
     }
 }

@@ -10,8 +10,6 @@ async function createTask(task, uid) {
             title: task.title,
             duration: task.duration,
             priority: task.priority,
-            dateStart: "",
-            dateEnd: "",
             progress: 0,
             completed: false
         });

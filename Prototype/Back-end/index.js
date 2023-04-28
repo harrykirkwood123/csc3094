@@ -22,9 +22,10 @@ app.use(cors());
 
 const auth_router = require('./src/controllers/auth/authRouter')
 const tasks_router = require('./src/controllers/tasks/tasksRouter')
+const planner_router = require('./src/controllers/planner/plannerRouter')
 
-app.use('/', auth_router)
-app.use('/', tasks_router)
+app.use('/', auth_router, tasks_router, planner_router)
+// app.use('/', tasks_router)
 
 app.use(bodyParser.json());
 
