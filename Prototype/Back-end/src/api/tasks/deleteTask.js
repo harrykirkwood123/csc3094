@@ -5,7 +5,7 @@ const db = getFirestore();
 async function deleteTask(taskId, uid) {
     try {
         const tasksDocRef = doc(db, "Tasks", uid);
-        const tasksColRef = collection(tasksDocRef, "Jobs")
+        const tasksColRef = collection(tasksDocRef, "Tasks")
         await deleteDoc(doc(tasksColRef, taskId));
 
     } catch (error) {

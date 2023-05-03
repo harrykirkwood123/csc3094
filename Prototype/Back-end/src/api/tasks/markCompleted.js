@@ -1,13 +1,15 @@
-const { getFirestore, collection, setDoc, doc } = require("firebase/firestore");
+const { getFirestore, collection, setDoc, doc, serverTimestamp } = require("firebase/firestore");
 
 const db = getFirestore();
 
-async function markCompleted(job, uid) {
+async function markCompleted(task, uid) {
     try {
-        const jobsDocRef = doc(db, "Jobs", uid);
-        const jobsColRef = collection(jobsDocRef, "Jobs")
-        await setDoc(doc(jobsColRef, job.id), {
-            completed: true
+        const tasksDocRef = doc(db, "Tasks", uid);
+        const tasksColRef = collection(tasksDocRef, "Tasks")
+        await setDoc(doc(tasksColRef, task.id), {
+            completed: true,
+            completedTime: serverTimestamp(),
+            startTime: null
         }, {
             merge: true
         });

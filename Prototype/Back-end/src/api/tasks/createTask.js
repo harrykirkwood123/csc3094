@@ -8,7 +8,7 @@ async function createTask(task, uid) {
         const tasksDbRef = collection(db, "Tasks", uid, "Tasks")
         await addDoc(tasksDbRef, {
             title: task.title,
-            duration: task.duration,
+            duration: parseInt(task.duration),
             priority: task.priority,
             progress: 0,
             completed: false

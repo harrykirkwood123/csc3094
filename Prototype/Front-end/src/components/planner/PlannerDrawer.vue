@@ -15,7 +15,7 @@
                @end="handleDrop"
                :move="checkFull">
       <template #item="{ element }">
-        <ion-card v-if="element.startTime == null">
+        <ion-card v-if="element.startTime == null && element.completed !== true">
           <ion-card-content>
             <ion-grid>
               <ion-row>
@@ -71,6 +71,7 @@ export default defineComponent ({
   computed: {
     dragOptions() {
       return {
+        delay: 100,
         animation: 200,
         group: "tasks",
         disabled: false,

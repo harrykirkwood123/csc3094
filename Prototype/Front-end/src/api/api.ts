@@ -112,12 +112,28 @@ export default function api() {
         }
     }
 
+    const markCompleted = async (payload) => {
+        const auth = getAuth();
+        const token = await getIdToken(auth.currentUser)
+
+        try {
+            await axios.post(host + '/tasks/markcompleted/', payload, {headers:
+                    { authorization: `Bearer ${token}` }}).then(async (r) => {
+                await responseHandler(r, "Task Completed")
+            })
+        }
+        catch (e) {
+            await errorHandler(e)
+        }
+    }
+
 
     return {
         signUp,
         login,
         createTask,
         setStartTime,
-        removeStartTime
+        removeStartTime,
+        markCompleted
     }
 }

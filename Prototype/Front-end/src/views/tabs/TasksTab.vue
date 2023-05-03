@@ -1,10 +1,10 @@
 <template>
-  <ion-page>
+<!--  <ion-page>-->
     <ion-content>
-      <task-list-item v-for="task in tasks" :key="task.id" :task="task"></task-list-item>
-      <create-task v-if="hideDrawer" ref="createTask"></create-task>
+      <task-list-item @view-timer="viewTimerParent" v-for="task in tasks" :key="task.id" :task="task"></task-list-item>
+      <create-task style="padding-top: 80px" v-if="tab" ref="createTask"></create-task>
     </ion-content>
-  </ion-page>
+<!--  </ion-page>-->
 </template>
 
 <script>
@@ -21,15 +21,23 @@ const auth = getAuth()
 export default defineComponent ({
   name: "TasksTab",
   components: {
-    IonPage,
+    // IonPage,
     IonContent,
     CreateTask,
     TaskListItem,
   },
+  props: {
+    tab: Boolean
+  },
   data () {
     return {
       tasks: [],
-      hideDrawer: false
+      hideDrawer: true
+    }
+  },
+  methods: {
+    async viewTimerParent(task) {
+      this.$emit("viewTimerParent", task)
     }
   },
   firestore: {

@@ -1,12 +1,12 @@
 <template>
   <div class="container">
-    <ve-progress thickness="8%" color="#00A896" :progress="progress" :size="250" animation="loop" font-size="2rem">
+    <ve-progress thickness="10%" color="#00A896" :progress="progress" :size="300" animation="loop" font-size="2rem">
       <span slot="legend-value">{{this.timer.hours + " : " + this.timer.minutes + " : " + this.timer.seconds }}</span>
     </ve-progress>
   </div>
 
   <div class="button">
-    <ion-button @click="addFive">add 5m</ion-button>
+    <ion-button size="large" @click="addFive">add 5m</ion-button>
   </div>
 
   <div class="floatingbutton">
@@ -43,6 +43,14 @@ export default defineComponent({
       localDuration: 0
     }
   },
+  watch: {
+    task(newTask) {
+      console.log(newTask)
+      this.time = new Date();
+      this.time.setSeconds(this.time.getSeconds() + newTask.duration);
+      this.timer = useTimer(this.time, false);
+    }
+  },
   computed: {
     progress: function() {
       const seconds = this.localDuration - ((((this.timer.hours * 60) + this.timer.minutes) * 60) + this.timer.seconds)
@@ -72,19 +80,18 @@ export default defineComponent({
     }
   },
   props :{
-    task: String,
-    duration: String
+    task: {
+      // type: Object,
+      default() {
+        return { duration: 900 }
+      }
+    }
   },
   mounted() {
-    this.localDuration = this.duration
+    this.localDuration = 900
 
-    if (this.duration !== null) {
-      this.time.setSeconds(this.time.getSeconds() + parseInt(this.duration));
-      this.timer = useTimer(this.time, false);
-    } else {
-      this.time.setSeconds(this.time.getSeconds() + 600);
-      this.timer = useTimer(this.time, false);
-    }
+    this.time.setSeconds(this.time.getSeconds() + 900);
+    this.timer = useTimer(this.time, false);
   },
   setup () {
     return {
@@ -100,6 +107,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: 10px;
 }
 
 .floatingbutton {

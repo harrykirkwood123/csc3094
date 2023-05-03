@@ -6,19 +6,17 @@
       </div>
       <div class="container ion-padding-horizontal" style="top: 50%;">
         <ion-item>
-          <ion-label position="floating">Email</ion-label>
-          <ion-input label="email" label-placement="floating" fill="outline" type="email" v-model="payload.email"></ion-input>
+          <ion-input label="email" type="email" v-model="payload.email"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Password</ion-label>
-          <ion-input label="password" label-placement="floating" fill="outline" type="password" v-model="payload.password"></ion-input>
+          <ion-input label="password" type="password" v-model="payload.password"></ion-input>
         </ion-item>
       </div>
     </ion-content>
 
     <ion-footer class="ion-no-border ion-padding-bottom" translucent="true">
       <div>
-        <ion-button expand="block" class="ion-padding-horizontal" size="large" style="color: white; --border-radius: 20px; font-size: 25px;" @click="doLogin()">login</ion-button>
+        <ion-button expand="block" class="ion-padding-horizontal" size="large" style="color: white; --border-radius: 20px; font-size: 25px;" @click="doLogin">login</ion-button>
         <br>
         <ion-button expand="block" class="ion-padding-horizontal" size="large" style="color: white; --border-radius: 20px; font-size: 25px; --background: #02C39A;" @click="signUp()">create account</ion-button>
       </div>
@@ -28,24 +26,40 @@
 
 <script>
 import { defineComponent, ref } from 'vue'
-import { useRouter } from "vue-router"
+import { useIonRouter } from '@ionic/vue';
 import { IonPage, IonContent, IonInput, IonItem, IonButton, IonFooter, loadingController } from '@ionic/vue';
 import api from "@/api/api";
+import useFirebaseAuth from "@/hooks/firebase-auth";
+const { login  } = useFirebaseAuth();
 
 export default defineComponent ({
   name: "LoginView",
   setup() {
-    const { login } = api();
+    // const { login } = api();
 
-    const router = useRouter();
+    const ionRouter = useIonRouter();
 
     const payload = ref({
-      email : "",
-      password : ""
+      email : "harrykirkwood123@gmail.com",
+      password : "password"
     })
 
     // Handle login using the api module method
-    const doLogin = async () => {
+    function doLogin() {
+
+
+      console.log("logging ppppp in")
+      login(payload.value.email, payload.value.password).then(() => {
+
+      })
+
+      ionRouter.push("/tasks")
+
+      console.log("HELLO")
+
+    }
+
+    const doppLogin = async () => {
 
       const loading = await loadingController
           .create({
@@ -59,13 +73,22 @@ export default defineComponent ({
         loading.dismiss()
       }, 1000);
 
-      await login(payload.value)
-      await router.push("/home")
+      console.log("logging ppppp in")
+      // await login(payload.value.email, payload.value.password).then(async () => {
+      //   console.log("logged in")
+      //   console.log("pushing to tasks")
+      //
+      // })
+
+      await ionRouter.push("/tasks")
+
+      console.log("HELLO")
+
     }
 
     // Route the user to the signup page
     const signUp = async () => {
-      await router.replace("/signup")
+      // await router.replace("/signup")
     }
 
     // Show the getting started modal

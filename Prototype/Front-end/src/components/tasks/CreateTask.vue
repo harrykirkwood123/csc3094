@@ -11,7 +11,7 @@
         </ion-item>
 
         <ion-item>
-          <ion-input placeholder="duration" v-model="payload.duration"></ion-input>
+          <ion-input label="duration" type="number" placeholder="duration" v-model="payload.duration"></ion-input>
         </ion-item>
       </ion-list>
 
@@ -41,7 +41,7 @@ export default defineComponent ({
       payload: {
         title: "",
         priority: "",
-        duration: ""
+        duration: null
       }
     }
   },
@@ -63,10 +63,10 @@ export default defineComponent ({
 
     const options = {
       topperOverflow: true,
-      draggableOver: false,
+      draggableOver: true,
       preventClicks: false,
       preventScroll: true,
-      topperOverflowOffset: 60,
+      topperOverflowOffset: 40,
       buttonClose: false,
       bottomClose: false,
       lowerThanBottom: false,
@@ -79,7 +79,7 @@ export default defineComponent ({
         },
         middle: {
           enabled: true,
-          height: 100,
+          height: 150,
           bounce: true
         },
         bottom: {

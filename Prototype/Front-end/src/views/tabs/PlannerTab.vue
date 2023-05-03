@@ -5,9 +5,6 @@
           <template #opposite="slotProps">
             <span :ref="slotProps.item.time.toString()" v-if="!slotProps.item.hidden">{{ formatTimeFromSeconds(slotProps.item.time) }}</span>
           </template>
-
-
-
           <template #content="slotProps">
             <draggable
                        class="list-group"
@@ -21,13 +18,13 @@
               <template #item="{ element }">
                 <ion-card>
                   <ion-card-content>
-                    <ion-grid>
+                    <ion-grid class="ion-no-padding">
                       <ion-row>
                         <ion-col size="auto" class="left-align">
                           <ion-avatar style="max-width: 30px; max-height: 30px" :class="{'priority-high': element.priority === 'High', 'priority-medium': element.priority === 'Medium', 'priority-low': element.priority === 'Low'}"></ion-avatar>
                         </ion-col>
                         <ion-col>
-                          <h2>{{ element.title }}</h2>
+                          <h2 style="padding-left: 10px">{{ element.title }}</h2>
                         </ion-col>
                         <ion-col size="auto" class="right-align">
                           <ion-card-title color="primary" style="font-size: 18px">{{ duration(element.duration) }}</ion-card-title>
@@ -41,22 +38,6 @@
           </template>
         </Timeline>
 
-
-<!--      <ion-fab style="padding-bottom: 55px" slot="fixed" vertical="bottom" horizontal="end">-->
-<!--        <ion-fab-button>-->
-<!--          <draggable-->
-<!--              v-model="removed"-->
-<!--              group="tasks"-->
-<!--              item-key="id"-->
-<!--              v-bind="removeOptions"-->
-<!--              :component-data="getComponentData()">-->
-<!--            <template #item="{element}">-->
-<!--              <span> {element} </span>-->
-<!--            </template>-->
-<!--          </draggable>-->
-<!--        </ion-fab-button>-->
-<!--      </ion-fab>-->
-
       <ion-fab style="padding-bottom: 55px" slot="fixed" vertical="bottom" horizontal="end">
         <ion-fab-button>
           <draggable
@@ -66,7 +47,7 @@
               v-bind="removeOptions"
               :component-data="getComponentData()"
               @change="callRemoveStartTime">
-            <template #item="{element}">
+            <template #item="{}">
               <ion-icon :icon="trashBin"></ion-icon>
             </template>
           </draggable>
@@ -75,7 +56,7 @@
 
       <ion-icon></ion-icon>
 
-      <planner-drawer v-if="hideDrawer" :tasks="tasks"></planner-drawer>
+      <planner-drawer v-if="tab" :tasks="tasks"></planner-drawer>
     </ion-content>
   </ion-page>
 </template>
@@ -110,6 +91,9 @@ const db = useFirestore()
 const auth = getAuth()
 export default defineComponent( {
   name: "PlannerTab",
+  props: {
+    tab: Boolean
+  },
   data() {
     return {
       times: [],
@@ -132,7 +116,7 @@ export default defineComponent( {
   watch: {
     tasks: {
       deep: true,
-      handler(newTasks, oldTasks) {
+      handler() {
         if (this.populated === false) { // Only trigger the watcher when a new task is added
           this.populateTimesWithTasks();
           this.populated = true;
@@ -284,9 +268,6 @@ export default defineComponent( {
       this.callSetStartTime({
         id: task.item.task[0].id,
         startTime: task.item.time
-        // completed: task.item.task[0].completed,
-        // duration: task.item.task[0].duration,
-        // priority: task.item.task[0].priority,
       })
 
       this.times = newTimes;
@@ -310,7 +291,7 @@ export default defineComponent( {
     populateTimesWithTasks: function() {
       for (let i = 0; i < this.tasks.length; i++) {
         const task = this.tasks[i];
-        if (task.startTime !== undefined && task.startTime !== null) {
+        if (task.startTime !== undefined && task.startTime !== null && task.completed !== true) {
           const timeIndex = this.times.findIndex(timeSlot => timeSlot.time === task.startTime);
 
           if (timeIndex !== -1) {
@@ -345,7 +326,7 @@ export default defineComponent( {
       newTimes.forEach((timeSlot, index) => {
         if (timeSlot.occupied) {
           const durationSize = timeSlot.task[0].duration / 900;
-          let overlappingTasks = [];
+          const overlappingTasks = [];
 
           // Collect overlapping tasks
           for (let c = 1; c < durationSize; c++) {
@@ -440,7 +421,7 @@ export default defineComponent( {
 
 .list-group {
   min-height: 30px;
-  min-width: 250px;
+  min-width: 270px;
 }
 
 .flip-list-move {
@@ -459,11 +440,17 @@ export default defineComponent( {
 }
 
 :deep(.p-timeline .p-timeline-event) {
-  padding: 0 1rem;
+  padding: 0 0;
 }
 
 :deep(.p-timeline-event-opposite) {
   flex: 1;
+  /*position: relative;*/
+
+}
+
+:deep(.p-timeline .p-timeline-event-content ) {
+  padding: 0 0;
   /*position: relative;*/
 
 }
