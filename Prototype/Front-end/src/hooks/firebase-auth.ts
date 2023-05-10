@@ -1,6 +1,7 @@
-import { toRefs, reactive } from "vue";
-import { getApps, initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, initializeAuth, indexedDBLocalPersistence } from "firebase/auth";
+import { Capacitor } from '@capacitor/core';
+
 
 import FIREBASE_CONFIG from "@/firebaseConfig";
 
@@ -13,7 +14,13 @@ import FIREBASE_CONFIG from "@/firebaseConfig";
 // }
 
 const app = initializeApp(FIREBASE_CONFIG);
-const auth = getAuth(app);
+
+if (Capacitor.isNativePlatform) {
+    initializeAuth(app, {
+        persistence: indexedDBLocalPersistence
+    });
+}
+export const auth = getAuth(app);
 
 // const state = reactive<{ user: any; initialized: boolean; error: any }>({
 //     user: null,
@@ -40,50 +47,49 @@ export async function logout() {
     await signOut(auth)
 }
 
-export default function() {
-    const login = async (username, password) => {
-        await signInWithEmailAndPassword(auth, username, password)
-
-        console.log("HELLO")
-    }
-
-    return {
-        login
-    }
-
-    // Signs the user out.
-    // const logout = () => {
-    //     const auth = getAuth();
-    //
-    //     return signOut(auth)
-    //         .then(() => {
-    //             state.user = null;
-    //         });
-    // };
-    //
-    // const authCheck = () => {
-    //     // Used to check whether a user is currently signed in. This is used by the router to determine
-    //     // whether a user is allowed to access pages depending on whether they are authenticated
-    //     const auth = getAuth();
-    //
-    //
-    //     return new Promise((resolve) => {
-    //         !state.initialized &&
-    //         onAuthStateChanged(auth, (user) => {
-    //             if (user) {
-    //                 state.user = user;
-    //             } else {
-    //                 state.user = null;
-    //             }
-    //             state.initialized = true;
-    //             resolve(true);
-    //         });
-    //     });
-    // };
-    //
-    // return {
-    //     ...toRefs(state),
-    //     logout,
-    //     authCheck,
-    // };
+export async function login(username, password) {
+    await signInWithEmailAndPassword(auth, username, password)
+    return username;
 }
+
+// export default function() {
+//
+//
+//
+//
+//     // Signs the user out.
+//     // const logout = () => {
+//     //     const auth = getAuth();
+//     //
+//     //     return signOut(auth)
+//     //         .then(() => {
+//     //             state.user = null;
+//     //         });
+//     // };
+//     //
+//     // const authCheck = () => {
+//     //     // Used to check whether a user is currently signed in. This is used by the router to determine
+//     //     // whether a user is allowed to access pages depending on whether they are authenticated
+//     //     const auth = getAuth();
+//     //
+//     //
+//     //     return new Promise((resolve) => {
+//     //         !state.initialized &&
+//     //         onAuthStateChanged(auth, (user) => {
+//     //             if (user) {
+//     //                 state.user = user;
+//     //             } else {
+//     //                 state.user = null;
+//     //             }
+//     //             state.initialized = true;
+//     //             resolve(true);
+//     //         });
+//     //     });
+//     // };
+//     //
+//     // return {
+//     //     ...toRefs(state),
+//     //     logout,
+//     //     authCheck,
+//     // };
+// }

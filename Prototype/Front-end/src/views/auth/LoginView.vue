@@ -5,11 +5,17 @@
         <img src="../../assets/Logo.png" class="logo">
       </div>
       <div class="container ion-padding-horizontal" style="top: 50%;">
-        <ion-item>
-          <ion-input label="email" type="email" v-model="payload.email"></ion-input>
+<!--        <ion-item>-->
+<!--          <ion-input label="email" type="email" v-model="payload.email"></ion-input>-->
+<!--        </ion-item>-->
+        <ion-item fill="outline" mode="md" style="min-width: 80%; padding-bottom: 20px;">
+          <ion-input label="email" label-placement="floating" placeholder="email" v-model="payload.email"></ion-input>
         </ion-item>
-        <ion-item>
-          <ion-input label="password" type="password" v-model="payload.password"></ion-input>
+<!--        <ion-item>-->
+<!--          <ion-input label="password" type="password" v-model="payload.password"></ion-input>-->
+<!--        </ion-item>-->
+        <ion-item fill="outline" mode="md" style="min-width: 80%; padding-bottom: 20px;">
+          <ion-input label="password" type="password" label-placement="floating" placeholder="password" v-model="payload.password"></ion-input>
         </ion-item>
       </div>
     </ion-content>
@@ -25,12 +31,11 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
+import { defineComponent, reactive } from 'vue'
 import { useIonRouter } from '@ionic/vue';
 import { IonPage, IonContent, IonInput, IonItem, IonButton, IonFooter, loadingController } from '@ionic/vue';
 import api from "@/api/api";
-import useFirebaseAuth from "@/hooks/firebase-auth";
-const { login  } = useFirebaseAuth();
+// import { login } from "@/hooks/firebase-auth";
 
 export default defineComponent ({
   name: "LoginView",
@@ -39,27 +44,13 @@ export default defineComponent ({
 
     const ionRouter = useIonRouter();
 
-    const payload = ref({
+    const payload = reactive({
       email : "harrykirkwood123@gmail.com",
       password : "password"
     })
 
-    // Handle login using the api module method
-    function doLogin() {
-
-
-      console.log("logging ppppp in")
-      login(payload.value.email, payload.value.password).then(() => {
-
-      })
-
-      ionRouter.push("/tasks")
-
-      console.log("HELLO")
-
-    }
-
-    const doppLogin = async () => {
+    const doLogin = async () => {
+      const { login } = api();
 
       const loading = await loadingController
           .create({
@@ -73,16 +64,9 @@ export default defineComponent ({
         loading.dismiss()
       }, 1000);
 
-      console.log("logging ppppp in")
-      // await login(payload.value.email, payload.value.password).then(async () => {
-      //   console.log("logged in")
-      //   console.log("pushing to tasks")
-      //
-      // })
-
-      await ionRouter.push("/tasks")
-
-      console.log("HELLO")
+      await login(payload).then(async () => {
+        await ionRouter.replace("/tasks")
+      })
 
     }
 
@@ -91,16 +75,6 @@ export default defineComponent ({
       // await router.replace("/signup")
     }
 
-    // Show the getting started modal
-    async function showModal() {
-      // const modal = await modalController
-      //     .create({
-      //       component: GettingStartedModal,
-      //       cssClass: 'modalStyle'
-      //     })
-      // return modal.present();
-
-    }
     return {
       payload,
       signUp,

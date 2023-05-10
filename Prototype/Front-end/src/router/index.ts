@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
+// import { getCurrentUser } from '@/hooks/firebase-auth'
+import api from "@/api/api";
 
-// import useFirebaseAuth from "../hooks/firebase-auth";
-import { getCurrentUser } from '@/hooks/firebase-auth'
+const { getCurrentUser } = api();
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -14,11 +15,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'login',
     component: () => import('@/views/auth/LoginView.vue'),
   },
-  {
-    path: '/test',
-    name: 'test',
-    component: () => import('@/views/Test.vue'),
-  },
   // {
   //   path: '/signup',
   //   name: 'signup',
@@ -28,9 +24,9 @@ const routes: Array<RouteRecordRaw> = [
     path: '/tasks',
     name: 'tasks',
     component: () => import('@/views/HomeView.vue'),
-    // meta: {
-    //   requiresAuth: true
-    // }
+    meta: {
+      requiresAuth: true
+    }
   }
 ]
 
@@ -52,11 +48,11 @@ const router = createRouter({
 //   }
 // });
 
-// router.beforeEach(async (to) => {
-//   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
-//   if (requiresAuth && !(await getCurrentUser())) {
-//     return '/login'
-//   }
-// })
+router.beforeEach(async (to) => {
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  if (requiresAuth && !(await getCurrentUser())) {
+    return '/login'
+  }
+})
 
 export default router

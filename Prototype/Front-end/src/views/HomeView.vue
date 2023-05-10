@@ -7,6 +7,7 @@
               v-for="(slide, index) in tabs"
               :key="index"
               :class="['custom-bullet', { 'swiper-pagination-bullet-active': index === activeIndex }]"
+              @click="handlePaginationClick(index)"
               :style="{
               transform: `translateX(${(index - activeIndex) * (index === activeIndex - 1 || index === activeIndex + 1 ? 180 : 180)}%)`,
               fontSize: index === activeIndex ? '2rem' : '1.2rem',
@@ -24,15 +25,18 @@
               :slides-per-view="1"
               :space-between="10"
               class="swiper"
-              @slideChange="onSlideChange">
+              @slideChange="onSlideChange"
+              @slideChangeTransitionStart="destroyPanes"
+              @slideChangeTransitionEnd="notDestroyPanes"
+              @afterInit="notDestroyPanes">
         <swiper-slide>
           <progress-tab></progress-tab>
         </swiper-slide>
         <swiper-slide>
-          <planner-tab :tab="activeIndex === 1"></planner-tab>
+          <planner-tab @lock-slide="lockSlide" @unlock-slide="unlockSlide" :destroy="destroy" v-if="activeIndex === 1" :tab="activeIndex === 1"></planner-tab>
         </swiper-slide>
         <swiper-slide>
-          <tasks-tab @view-timer-parent="viewTimer" :tab="activeIndex === 2"></tasks-tab>
+          <tasks-tab @view-timer-parent="viewTimer" v-if="activeIndex === 2" :tab="activeIndex === 2"></tasks-tab>
         </swiper-slide>
         <swiper-slide>
           <timer-tab :task="data.task"></timer-tab>
@@ -46,7 +50,7 @@
 </template>
 
 <script>
-import { IonPage, IonContent, IonicSlides, IonHeader, IonToolbar } from '@ionic/vue';
+import { IonPage, IonContent, IonHeader, IonToolbar, IonicSlides } from '@ionic/vue';
 import { readerOutline, timerOutline, cogOutline, analyticsOutline, calendarNumberOutline } from 'ionicons/icons';
 import TasksTab from "@/views/tabs/TasksTab.vue";
 import PlannerTab from "@/views/tabs/PlannerTab.vue";
@@ -64,7 +68,8 @@ export default defineComponent( {
   data() {
     return {
       tabs: ["progress", "planner", "tasks", "timer", "settings"],
-      activeIndex: 0
+      activeIndex: 2,
+      destroy: false
     }
   },
   computed: {
@@ -89,12 +94,19 @@ export default defineComponent( {
     IonHeader,
   },
   methods: {
+    destroyPanes() {
+      this.destroy = true
+    },
+
+    notDestroyPanes() {
+      this.destroy = false
+    },
+
     onSlideChange(swiper) {
       this.activeIndex = swiper.activeIndex;
-      console.log(this.activeIndex)
     }
   },
-  setup() {
+  setup(props, { emit }) {
     const { setUser } = useState()
 
     const data = reactive({
@@ -106,12 +118,26 @@ export default defineComponent( {
     const slides = ref();
     const setSwiperInstance = (swiper) => {
       slides.value = swiper;
-      slides.value.slideTo(2);
+      slides.value.slideTo(2, 0, false);
+    }
+
+    function handlePaginationClick(index) {
+      slides.value.slideTo(index);
     }
 
     function viewTimer(task) {
       slides.value.slideTo(3);
       data.task = task
+    }
+
+    function lockSlide() {
+      slides.value.allowTouchMove = false;
+      // slides.value.disable();
+    }
+
+    function unlockSlide() {
+      slides.value.allowTouchMove = true;
+      // slides.value.enable();
     }
 
     return {
@@ -124,7 +150,10 @@ export default defineComponent( {
       setSwiperInstance,
       slides,
       viewTimer,
-      data
+      data,
+      handlePaginationClick,
+      lockSlide,
+      unlockSlide
     }
   }
 });

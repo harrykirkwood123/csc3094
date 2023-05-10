@@ -1,27 +1,43 @@
 <template>
-  <v-cupertino id="1" :drawerOptions="options" ref="bottomSheet">
+  <v-cupertino id="1" :drawerOptions="options" ref="bottomSheet" @touchstart="$emit('disableDrag')" @touchend="$emit('enableDrag')">
     <div>
-      <ion-list>
-        <ion-item>
-          <ion-input placeholder="title" v-model="payload.title"></ion-input>
+      <h1 style="padding-bottom: 40px"> create a task </h1>
+
+    </div>
+    <div>
+      <ion-list style="display: flex; flex-direction: column; align-items: center;">
+        <ion-item fill="outline" mode="md" style="min-width: 80%; padding-bottom: 20px;">
+          <ion-input autocapitalize="words" label="title" label-placement="floating" placeholder="title" v-model="payload.title"></ion-input>
         </ion-item>
 
-        <ion-item>
-          <ion-input placeholder="priority" v-model="payload.priority"></ion-input>
+        <ion-item fill="outline" mode="md" style="min-width: 80%; padding-bottom: 20px;">
+          <ion-input label="priority" :readonly="true"  @click="priorityPicker" label-placement="floating" placeholder="priority" v-model="payload.priority"></ion-input>
+          <ion-picker
+              :isOpen="pPicker"
+              :columns="priorityOptions"
+              :buttons="priorityButtons"
+              @did-dismiss="pPicker = false"
+          ></ion-picker>
         </ion-item>
 
-        <ion-item>
-          <ion-input label="duration" type="number" placeholder="duration" v-model="payload.duration"></ion-input>
+        <ion-item fill="outline" mode="md" style="min-width: 80%; padding-bottom: 20px;">
+          <ion-input id="duration" :readonly="true" @click="durationPicker" label="duration" placeholder="duration" v-model="displayedDuration"></ion-input>
+          <ion-picker
+              :isOpen="dPicker"
+              :columns="durationOptions"
+              :buttons="durationButtons"
+              @did-dismiss="dPicker = false"
+          ></ion-picker>
         </ion-item>
+
+        <ion-button :disabled="valid" expand="block" style="min-width: 80%;" size="large" slot="bottom" @click="callCreateTask">Submit</ion-button>
       </ion-list>
-
-      <ion-button expand="block" slot="bottom" @click="callCreateTask">Submit</ion-button>
     </div>
   </v-cupertino>
 </template>
 
 <script lang="ts">
-import { IonList, IonItem, IonInput, IonButton } from "@ionic/vue";
+import { IonList, IonItem, IonInput, IonButton, IonPicker } from "@ionic/vue";
 import { defineComponent, ref, Ref } from "vue";
 import api from "@/api/api";
 import VCupertino from "v-cupertino";
@@ -34,14 +50,126 @@ export default defineComponent ({
     IonList,
     IonItem,
     IonInput,
-    IonButton
+    IonButton,
+    IonPicker
   },
   data() {
     return {
+      dPicker: false,
+      pPicker: false,
+      displayedDuration: null,
       payload: {
-        title: "",
-        priority: "",
+        title: null,
+        priority: null,
         duration: null
+      },
+      priorityOptions: [
+        {
+          name: 'priorities',
+          options: [
+            {
+              text: 'Low',
+              value: 'Low'
+            },
+            {
+              text: 'Medium',
+              value: 'Medium'
+            },
+            {
+              text: 'High',
+              value: 'High'
+            }
+          ]
+        }
+      ],
+      priorityButtons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Confirm',
+          handler: (value) => {
+            this.setPriority(value);
+          }
+        }
+      ],
+      durationOptions: [
+        {
+          name: 'hours',
+          options: [
+            {
+              text: '0hr',
+              value: 0
+            },
+            {
+              text: '1hr',
+              value: 3600
+            },
+            {
+              text: '2hr',
+              value: 7200
+            },
+            {
+              text: '3hr',
+              value: 10800
+            },
+            {
+              text: '4hr',
+              value: 14400
+            }
+          ]
+        },
+        {
+        name: 'minutes',
+        options: [
+          {
+            text: '0m',
+            value: 0
+          },
+          {
+            text: '15m',
+            value: 900
+          },
+          {
+            text: '30m',
+            value: 1800
+          },
+          {
+            text: '45m',
+            value: 2700
+          }
+        ]
+      }],
+      durationButtons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Confirm',
+          handler: (value) => {
+            this.setDuration(value);
+          }
+        }
+      ]
+    }
+  },
+  computed: {
+    valid() {
+      const payload = this.payload
+      if (payload.title === null || payload.priority === null || payload.duration === null) {
+        return true
+      }
+
+      if (payload.title === "" || payload.priority === "" || payload.duration === "") {
+        return true
+      }
+
+      if (payload.duration === 0) {
+        return true
+      } else {
+        return false
       }
     }
   },
@@ -51,6 +179,23 @@ export default defineComponent ({
 
       await createTask(this.payload)
       this.destroyDrawer()
+    },
+
+    async durationPicker() {
+      this.dPicker = true;
+    },
+
+    async priorityPicker() {
+      this.pPicker = true;
+    },
+
+    async setDuration(value) {
+      this.payload.duration = value.hours.value + value.minutes.value;
+      this.displayedDuration = value.hours.text + " " + value.minutes.text;
+    },
+
+    async setPriority(value) {
+      this.payload.priority = value.priorities.value;
     }
   },
   setup() {
@@ -61,12 +206,18 @@ export default defineComponent ({
       cupertino.moveToBreak("middle");
     }
 
+    const showDrawer = () => {
+      const cupertino = bottomSheet.value.cupertino as CupertinoPane;
+      cupertino.moveToBreak("top");
+    }
+
     const options = {
+      animationDuration: 300,
       topperOverflow: true,
-      draggableOver: true,
-      preventClicks: false,
-      preventScroll: true,
-      topperOverflowOffset: 40,
+      draggableOver: false,
+      preventClicks: true,
+      preventScroll: false,
+      topperOverflowOffset: 50,
       buttonClose: false,
       bottomClose: false,
       lowerThanBottom: false,
@@ -79,7 +230,7 @@ export default defineComponent ({
         },
         middle: {
           enabled: true,
-          height: 150,
+          height: 200,
           bounce: true
         },
         bottom: {
@@ -88,10 +239,38 @@ export default defineComponent ({
       }
     }
 
+    // const options = {
+    //   topperOverflow: true,
+    //   draggableOver: true,
+    //   preventClicks: false,
+    //   preventScroll: true,
+    //   topperOverflowOffset: 40,
+    //   buttonClose: false,
+    //   bottomClose: false,
+    //   lowerThanBottom: false,
+    //   initialBreak: "middle",
+    //   breaks: {
+    //     top: {
+    //       enabled: true,
+    //       height: 680,
+    //       bounce: true
+    //     },
+    //     middle: {
+    //       enabled: true,
+    //       height: 200,
+    //       bounce: true
+    //     },
+    //     bottom: {
+    //       enabled: false
+    //     }
+    //   }
+    // }
+
     return {
       options,
       bottomSheet,
-      destroyDrawer
+      destroyDrawer,
+      showDrawer
     }
 
   }

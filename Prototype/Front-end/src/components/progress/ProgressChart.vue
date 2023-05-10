@@ -1,11 +1,14 @@
 <template>
-  <Bar
-      id="progress-chart"
-      :options="chartOptions"
-      :data="taskProgress"
+  <div>
+    <h1>tasks completed: <span class="total-tasks"> {{ tasksTotal }} </span></h1>
+    <Bar
+        id="progress-chart"
+        :options="chartOptions"
+        :data="taskProgress"
 
-      v-if="tasks"
-  />
+        v-if="tasks"
+    />
+  </div>
 </template>
 
 <script>
@@ -28,6 +31,7 @@ export default defineComponent ({
   data() {
     return {
       tasks: [],
+      tasksTotal: 0,
       chartData: {
         labels: ['m', 't', 'w', 't', 'f', 's', 's'],
         datasets: [
@@ -80,15 +84,8 @@ export default defineComponent ({
       }
     }
   },
-  computed: {
-    myStyles () {
-      return {
-        position: 'relative',
-        height: '230px'
-      }
-    },
-
-    taskProgress() {
+  methods: {
+    calculateCompleted() {
       // Initialize an array of 7 zeros representing the tasks completed on each day of the week
       const tasksCompleted = [0, 0, 0, 0, 0, 0, 0];
 
@@ -102,6 +99,22 @@ export default defineComponent ({
           tasksCompleted[mappedDayOfWeek]++;
         }
       });
+
+      this.tasksTotal = tasksCompleted.reduce((a, b) => a + b, 0)
+
+      return tasksCompleted;
+    }
+  },
+  computed: {
+    myStyles () {
+      return {
+        position: 'relative',
+        height: '230px'
+      }
+    },
+
+    taskProgress() {
+      const tasksCompleted = this.calculateCompleted();
 
       return {
         labels: ['m', 't', 'w', 't', 'f', 's', 's'],
@@ -124,5 +137,9 @@ export default defineComponent ({
 </script>
 
 <style scoped>
-
+.total-tasks{
+  font-size: 2rem;
+  font-weight: bold;
+  color: #02C39A;
+}
 </style>

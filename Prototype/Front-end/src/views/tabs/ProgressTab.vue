@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import {defineComponent} from "vue";
 import { IonPage } from "@ionic/vue";
 import ProgressChart from "@/components/progress/ProgressChart.vue";
 export default defineComponent ({
@@ -13,10 +13,9 @@ export default defineComponent ({
   components: {
     IonPage,
     ProgressChart
-  }
+  },
 })
 </script>
 
 <style scoped>
-
 </style>

@@ -1,19 +1,20 @@
 <template>
   <ion-page>
-    <ion-content ref="contentRef">
+    <ion-content ref="contentRef" :scroll-y="draggable">
         <Timeline align="left" layout="vertical" :value="times">
           <template #opposite="slotProps">
-            <span :ref="slotProps.item.time.toString()" v-if="!slotProps.item.hidden">{{ formatTimeFromSeconds(slotProps.item.time) }}</span>
+            <span :ref="slotProps.item.time.toString()">{{ formatTimeFromSeconds(slotProps.item.time) }}</span>
           </template>
           <template #content="slotProps">
             <draggable
+                       delay-on-touch-only="true"
                        class="list-group"
                        v-bind="dragOptions"
-                       ghost-class="ghostdrop"
                        v-model="slotProps.item.task"
-                       group="tasks"
                        :item-key="itemKey"
                        @add="handleDrag(slotProps)"
+                       @start="dragging"
+                       @end="notDragging"
                        :move="checkFull">
               <template #item="{ element }">
                 <ion-card>
@@ -38,25 +39,32 @@
           </template>
         </Timeline>
 
-      <ion-fab style="padding-bottom: 55px" slot="fixed" vertical="bottom" horizontal="end">
+
+
+      <ion-icon></ion-icon>
+
+      <planner-drawer :tasks="tasks"  @disable-drag="disableDrag" @enable-drag="enableDrag" @dragging="$emit('lockSlide')" @not-dragging="$emit('unlockSlide')"></planner-drawer>
+
+      <ion-fab v-if="fab" :activated="active" :class="{ 'ion-activated': active }" style="padding-bottom: 200px;" slot="fixed" vertical="bottom" horizontal="end">
         <ion-fab-button>
           <draggable
+              tag="ion-icon"
               v-model="removed"
               group="tasks"
               item-key="id"
               v-bind="removeOptions"
-              :component-data="getComponentData()"
-              @change="callRemoveStartTime">
+              :component-data="{
+                          icon: trashBin,
+                          id: 'trash'
+                       }"
+              @change="callRemoveStartTime"
+              ghost-class="ghostdrop">
             <template #item="{}">
-              <ion-icon :icon="trashBin"></ion-icon>
             </template>
           </draggable>
         </ion-fab-button>
       </ion-fab>
 
-      <ion-icon></ion-icon>
-
-      <planner-drawer v-if="tab" :tasks="tasks"></planner-drawer>
     </ion-content>
   </ion-page>
 </template>
@@ -80,7 +88,6 @@ import {
 } from "@ionic/vue";
 import PlannerDrawer from "@/components/planner/PlannerDrawer.vue";
 import { trashBin } from 'ionicons/icons';
-import TrashCan from "@/components/planner/TrashCan.vue";
 import draggable from "vuedraggable";
 import {collection, onSnapshot, query} from "firebase/firestore";
 import {useFirestore} from "vuefire";
@@ -91,44 +98,42 @@ const db = useFirestore()
 const auth = getAuth()
 export default defineComponent( {
   name: "PlannerTab",
+  emits: ['lockSlide', 'unlockSlide'],
   props: {
     tab: Boolean
   },
   data() {
     return {
+      fab: false,
+      active: false,
       times: [],
       hideDrawer: false,
       tasks: [],
       planner: [],
       setOccupied: false,
       populated: false,
-      removed: []
+      removed: [],
+      draggable: true
     }
   },
   mounted() {
     this.$nextTick(() => {
-      this.getTimePos();
       this.times = this.createEmptyTimesArray();
       this.populateTimesWithTasks();
-      console.log(this.times)
     });
   },
   watch: {
     tasks: {
       deep: true,
       handler() {
-        if (this.populated === false) { // Only trigger the watcher when a new task is added
+        if (this.populated === false) {
+          this.times = this.createEmptyTimesArray();
           this.populateTimesWithTasks();
+          this.getTimePos();
           this.populated = true;
         }
       }
     }
-  },
-  ionViewDidEnter() {
-    this.hideDrawer = true;
-  },
-  ionViewWillLeave() {
-    this.hideDrawer = false;
   },
   created() {
     this.fetchDocuments();
@@ -137,10 +142,11 @@ export default defineComponent( {
   computed: {
     dragOptions() {
       return {
+        delay: 100,
         animation: 200,
         group: "tasks",
         disabled: false,
-        ghostClass: "ghostdrop"
+        ghostClass: "ghostdrop",
       };
     },
 
@@ -148,12 +154,33 @@ export default defineComponent( {
       return {
         animation: 200,
         group: "tasks",
-        disabled: false,
-        emptyInsertThreshold: 30
+        disabled: false
       };
     }
   },
   methods: {
+    dragging() {
+      console.log("dragging")
+      this.draggable = false
+      this.fab = true;
+      this.$emit('lockSlide');
+    },
+
+    notDragging() {
+      console.log("not dragging")
+      this.draggable = true
+      this.fab = false;
+      this.$emit('unlockSlide');
+    },
+
+    enableDrag() {
+      this.draggable = true;
+    },
+
+    disableDrag() {
+      this.draggable = false;
+    },
+
     getComponentData() {
       return {
         tag: 'ion-icon',
@@ -168,8 +195,8 @@ export default defineComponent( {
     },
 
     async callRemoveStartTime(task) {
-      console.log(task)
       const { removeStartTime } = api()
+      this.active = false;
 
       this.removed = [];
 
@@ -206,10 +233,23 @@ export default defineComponent( {
 
       const currentTime = this.getCurrentTime();
 
-      const rect = this.$refs[currentTime.toString()].getBoundingClientRect();
+      let difference = 0;
+      let closest = 0;
+
+      for (let i = 0; i < this.times.length; i++) {
+        if (i === 0) {
+          difference = currentTime - this.times[i].time;
+        } else if (currentTime - this.times[i].time < difference && currentTime - this.times[i].time >= 0) {
+          difference = currentTime - this.times[i].time;
+          closest = this.times[i].time
+        }
+      }
+
+      const rect = this.$refs[closest.toString()].getBoundingClientRect();
+
       const y = rect.top + scrollPosition.scrollTop;
 
-      await this.$refs.contentRef.$el.scrollToPoint(0, y - 400, 500);
+      await this.$refs.contentRef.$el.scrollToPoint(0, y - 200, 500);
     },
 
     itemKey: function (evt) {
@@ -217,7 +257,19 @@ export default defineComponent( {
     },
 
     checkFull: function(evt) {
-      return (evt.relatedContext.list.length !== 1)
+      this.active = false;
+      if (evt.relatedContext.component.componentData) {
+        if (evt.relatedContext.component.componentData.name === "flip-list") {
+          return false
+        } else if (evt.relatedContext.component.componentData.id === "trash") {
+          this.active = true;
+          return true
+        }
+      } else if ((evt.relatedContext.list.length !== 1)) {
+        return true
+      } else {
+        return false
+      }
     },
 
     formatTimeFromSeconds(timeInSeconds) {
@@ -280,8 +332,7 @@ export default defineComponent( {
         newTimes.push({
           time: i * 900,
           task: [],
-          occupied: false,
-          hidden: false
+          occupied: false
         });
       }
 
@@ -298,7 +349,6 @@ export default defineComponent( {
             this.times[timeIndex].task.push(task);
             this.times[timeIndex].occupied = true;
 
-            // this.tasks.splice(i, 1);
           }
         }
       }
@@ -405,7 +455,6 @@ export default defineComponent( {
     PlannerDrawer,
     draggable,
     Timeline,
-    // TrashCan,
     IonFab,
     IonFabButton,
     IonIcon
@@ -414,14 +463,20 @@ export default defineComponent( {
 </script>
 
 <style scoped>
+.ion-activated {
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --transform: scale(1.1);
+  --transition: 0.2s transform ease-out;
+}
+
 .ghostdrop {
   background-color: #f5f6f9;
   opacity: 0.5;
 }
 
 .list-group {
-  min-height: 30px;
-  min-width: 270px;
+  min-height: 50px;
+  min-width: 300px;
 }
 
 .flip-list-move {
@@ -433,10 +488,10 @@ export default defineComponent( {
 }
 
 :deep(.p-timeline) {
-  padding-bottom: 50px;
+  padding-bottom: 250px;
+  padding-top: 20px;
   position: absolute;
   font-family: "Gotham Rounded", sans-serif;
-  /*align-self: flex-start;*/
 }
 
 :deep(.p-timeline .p-timeline-event) {
@@ -444,14 +499,20 @@ export default defineComponent( {
 }
 
 :deep(.p-timeline-event-opposite) {
-  flex: 1;
-  /*position: relative;*/
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: 65px;
+}
+
+
+
+:deep(.p-timeline.p-timeline-vertical .p-timeline-event-opposite) {
+  padding: 0 10px 0 0;
 
 }
 
 :deep(.p-timeline .p-timeline-event-content ) {
   padding: 0 0;
-  /*position: relative;*/
 
 }
 

@@ -3,6 +3,24 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const { initializeApp } = require('firebase/app');
 
+const allowedOrigins = [
+    'capacitor://localhost',
+    'ionic://localhost',
+    'http://localhost',
+    'http://localhost:8080',
+    'http://localhost:8100',
+];
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Origin not allowed by CORS'));
+        }
+    },
+};
+
 // firebase configuration settings
 const firebaseConfig = {
     apiKey: "AIzaSyAFtFYOD1pPtwSrfxzzX4lybyTfM2he3mY",
@@ -19,18 +37,18 @@ initializeApp(firebaseConfig);
 const app = express();
 
 app.use(cors());
+app.use(bodyParser.json());
 
 const auth_router = require('./src/controllers/auth/authRouter')
 const tasks_router = require('./src/controllers/tasks/tasksRouter')
 const planner_router = require('./src/controllers/planner/plannerRouter')
 
 app.use('/', auth_router, tasks_router, planner_router)
-// app.use('/', tasks_router)
 
-app.use(bodyParser.json());
+// const port = process.env.PORT || 8000;
+// app.listen(port, () => {
+//     console.log('Listening on: ', port);
+// });
 
-const port = process.env.PORT || 8000;
-app.listen(port, () => {
-    console.log('Listening on: ', port);
-});
+exports.app = functions.https.onRequest(app);
 

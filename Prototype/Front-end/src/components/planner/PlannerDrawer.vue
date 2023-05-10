@@ -1,5 +1,5 @@
 <template>
-  <v-cupertino id="2" :drawerOptions="options" ref="plannerDrawer">
+  <v-cupertino id="2" :drawerOptions="options" ref="plannerDrawer" @transitionend="getPosition" @touchstart="$emit('disableDrag')" @touchend="$emit('enableDrag')">
     <draggable ghost-class="ghostdrop"
                :list="tasks"
                group="tasks"
@@ -39,23 +39,22 @@
 
 <script lang="ts">
 import { defineComponent, ref, Ref } from "vue";
-import TaskListItem from "@/components/planner/TaskListItem.vue";
 import VCupertino from "v-cupertino";
 import { CupertinoPane } from "cupertino-pane";
-import { collection, query, onSnapshot } from "firebase/firestore";
 import { useFirestore } from 'vuefire'
 import { getAuth } from 'firebase/auth'
 import draggable from "vuedraggable";
 import { IonCard, IonCardTitle, IonCardContent, IonGrid, IonCol, IonRow, IonAvatar } from "@ionic/vue";
+import {trashBin} from "ionicons/icons";
 
 const db = useFirestore()
 const auth = getAuth()
 
 export default defineComponent ({
   name: "PlannerDrawer",
+  emits: ['drawerTop', 'drawerBottom', 'disableDrag', 'enableDrag', 'dragging', 'notDragging'],
   components: {
     VCupertino,
-    // TaskListItem,
     draggable,
     IonCard,
     IonCardTitle,
@@ -94,6 +93,12 @@ export default defineComponent ({
       return (evt.relatedContext.list.length !== 1)
     },
 
+    getComponentData() {
+      return {
+        name: 'drawer'
+      }
+    },
+
     duration: function (duration) {
       // Calculate hours and minutes
       const hours = Math.floor(duration / 3600);
@@ -116,16 +121,17 @@ export default defineComponent ({
       return formattedDuration;
     },
   },
-  setup() {
+  setup(props, { emit }) {
     const plannerDrawer: Ref<typeof VCupertino> = ref(VCupertino);
 
     const options = {
-      animationDuration: 500,
+      animationDuration: 200,
+      dragBy: ['.pane'],
+      bottomOffset: 50,
       topperOverflow: true,
       draggableOver: false,
       preventClicks: true,
       preventScroll: false,
-      simulateTouch: true,
       topperOverflowOffset: 50,
       buttonClose: false,
       bottomClose: false,
@@ -139,7 +145,7 @@ export default defineComponent ({
         },
         middle: {
           enabled: true,
-          height: 100,
+          height: 200,
           bounce: true
         },
         bottom: {
@@ -148,18 +154,27 @@ export default defineComponent ({
       }
     }
 
+    function getPosition() {
+      const cupertino = plannerDrawer.value.cupertino as CupertinoPane;
+
+      if (cupertino.currentBreak() === 'top') {
+        emit('drawerTop')
+      } else {
+        emit('drawerBottom')
+      }
+    }
+
     function handleDrag() {
       const cupertino = plannerDrawer.value.cupertino as CupertinoPane;
 
-
-      cupertino.moveToBreak("middle")
-      // cupertino.destroy();
+      emit('dragging');
+      cupertino.moveToBreak("middle");
     }
 
     function handleDrop() {
       const cupertino = plannerDrawer.value.cupertino as CupertinoPane;
 
-      // cupertino.present();
+      emit('notDragging')
       cupertino.moveToBreak("top");
     }
 
@@ -168,7 +183,8 @@ export default defineComponent ({
       options,
       handleDrag,
       handleDrop,
-      plannerDrawer
+      plannerDrawer,
+      getPosition,
     }
 
   }
@@ -178,6 +194,7 @@ export default defineComponent ({
 <style>
 .list-group {
   min-height: 50px;
+  min-width: 300px;
 }
 
 .flip-list-move {
@@ -190,7 +207,12 @@ export default defineComponent ({
 
 .ghostdrop {
   background-color: #f5f6f9;
+  opacity: 0.5;
 }
+
+/*.ghostdrop {*/
+/*  background-color: #f5f6f9;*/
+/*}*/
 
 .priority-high {
   background: #F76868;

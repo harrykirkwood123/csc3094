@@ -10,7 +10,8 @@
 import { defineComponent } from "vue";
 import { IonPage, IonButton, loadingController } from "@ionic/vue";
 // import useFirebaseAuth from "@/hooks/firebase-auth";
-import { logout } from "@/hooks/firebase-auth";
+// import { logout } from "@/hooks/firebase-auth";
+import api from "@/api/api";
 import { useRouter } from "vue-router";
 export default defineComponent ({
   name: "SettingsTab",
@@ -20,7 +21,7 @@ export default defineComponent ({
 
   },
   setup() {
-    // const { logout } = useFirebaseAuth();
+    const { logout } = api();
     const router = useRouter();
 
     const signOut = async () => {
@@ -38,7 +39,7 @@ export default defineComponent ({
 
       await logout();
       await router.replace({path: "/login"})
-      await location.reload();
+      // await location.reload();
 
     };
 

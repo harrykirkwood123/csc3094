@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-content fullscreen scroll-y="false">
+    <ion-content scroll-y="false">
       <TimerComponent :task="task"></TimerComponent>
 <!--      <ion-grid>-->
 <!--        <ion-row class="ion-justify-content-center">-->
@@ -24,7 +24,7 @@ import TimerComponent from "@/components/timer/TimerComponent.vue";
 export default defineComponent ({
   name: "TimerTab",
   props: {
-    task: {}
+    task: Object
   },
   components: {
     IonPage,
@@ -38,8 +38,5 @@ export default defineComponent ({
 </script>
 
 <style scoped>
-ion-grid {
-  --ion-grid-column-padding: 70px;
 
-}
 </style>

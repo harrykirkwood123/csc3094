@@ -1,10 +1,24 @@
 import axios from "axios";
-import {modalController, toastController} from "@ionic/vue";
-import { getAuth, signInWithEmailAndPassword, getIdToken } from "firebase/auth";
+import { toastController } from "@ionic/vue";
+import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, initializeAuth, indexedDBLocalPersistence, getIdToken } from "firebase/auth";
+import { Capacitor } from '@capacitor/core';
+
+import FIREBASE_CONFIG from "@/firebaseConfig";
+import { initializeApp } from "firebase/app";
 
 // Declaring the port and host address
 const port = 8000
-const host = "http://127.0.0.1:" + port
+// const host = "http://127.0.0.1:" + port
+const host = "https://adhd-prototype.web.app"
+
+const app = initializeApp(FIREBASE_CONFIG);
+
+if (Capacitor.isNativePlatform) {
+    initializeAuth(app, {
+        persistence: indexedDBLocalPersistence
+    });
+}
+export const auth = getAuth(app);
 
 // Declaring the api module
 export default function api() {
@@ -15,7 +29,7 @@ export default function api() {
             .create({
                 message: e.response.data,
                 duration: 2000,
-                color: 'dark',
+                color: 'light',
                 position: 'top'
             })
         return toast.present();
@@ -44,13 +58,37 @@ export default function api() {
         }
     }
 
+    function getCurrentUser() {
+        return new Promise((resolve, reject) => {
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                unsubscribe();
+                resolve(user);
+            }, reject);
+        });
+    }
+
     // login method uses firebase to sign in with the provided email & password
     const login = async (payload) => {
-        const auth = getAuth();
+       const auth = getAuth(app);
         try {
             await signInWithEmailAndPassword(auth, payload.email, payload.password).then(async r => {
                 r["status"] = 200
                 await responseHandler(r,"Logged in successfully")
+            })
+        }
+        catch (e) {
+            e["status"] = 200
+            await responseHandler(e, e.message)
+        }
+    }
+
+    const logout = async () => {
+        const auth = getAuth(app);
+        try {
+            await signOut(auth).then(async () => {
+                const r = {};
+                r["status"] = 200
+                await responseHandler(r,"Logged out successfully")
             })
         }
         catch (e) {
@@ -72,7 +110,7 @@ export default function api() {
     }
 
     const createTask = async (payload) => {
-        const auth = getAuth();
+        const auth = getAuth(app);
         const token = await getIdToken(auth.currentUser)
 
         try {
@@ -86,8 +124,23 @@ export default function api() {
         }
     }
 
+    const deleteTask = async (payload) => {
+        const auth = getAuth(app);
+        const token = await getIdToken(auth.currentUser)
+
+        try {
+            await axios.post(host + '/tasks/deletetask/', payload, {headers:
+                    { authorization: `Bearer ${token}` }}).then(async (r) => {
+                await responseHandler(r, "Task Deleted")
+            })
+        }
+        catch (e) {
+            await errorHandler(e)
+        }
+    }
+
     const setStartTime = async (payload) => {
-        const auth = getAuth();
+        const auth = getAuth(app);
         const token = await getIdToken(auth.currentUser)
 
         try {
@@ -100,7 +153,7 @@ export default function api() {
     }
 
     const removeStartTime = async (payload) => {
-        const auth = getAuth();
+        const auth = getAuth(app);
         const token = await getIdToken(auth.currentUser)
 
         try {
@@ -113,7 +166,7 @@ export default function api() {
     }
 
     const markCompleted = async (payload) => {
-        const auth = getAuth();
+        const auth = getAuth(app);
         const token = await getIdToken(auth.currentUser)
 
         try {
@@ -131,9 +184,12 @@ export default function api() {
     return {
         signUp,
         login,
+        logout,
         createTask,
+        deleteTask,
         setStartTime,
         removeStartTime,
-        markCompleted
+        markCompleted,
+        getCurrentUser
     }
 }
