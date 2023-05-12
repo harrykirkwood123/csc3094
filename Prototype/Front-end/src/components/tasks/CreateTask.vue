@@ -7,7 +7,7 @@
     <div>
       <ion-list style="display: flex; flex-direction: column; align-items: center;">
         <ion-item fill="outline" mode="md" style="min-width: 80%; padding-bottom: 20px;">
-          <ion-input autocapitalize="words" label="title" label-placement="floating" placeholder="title" v-model="payload.title"></ion-input>
+          <ion-input autocapitalize="on" label="title" type="text" label-placement="floating" placeholder="title" v-model="payload.title"></ion-input>
         </ion-item>
 
         <ion-item fill="outline" mode="md" style="min-width: 80%; padding-bottom: 20px;">
@@ -30,18 +30,20 @@
           ></ion-picker>
         </ion-item>
 
-        <ion-button :disabled="valid" expand="block" style="min-width: 80%;" size="large" slot="bottom" @click="callCreateTask">Submit</ion-button>
+        <ion-button id="createtask" :disabled="valid" expand="block" style="min-width: 80%;" size="large" slot="bottom" @click="callCreateTask">Submit</ion-button>
+        <ion-loading :is-open="loading" trigger="createtask" message="Creating task..."> </ion-loading>
       </ion-list>
     </div>
   </v-cupertino>
 </template>
 
 <script lang="ts">
-import { IonList, IonItem, IonInput, IonButton, IonPicker } from "@ionic/vue";
+import { IonList, IonItem, IonInput, IonButton, IonPicker, IonLoading } from "@ionic/vue";
 import { defineComponent, ref, Ref } from "vue";
 import api from "@/api/api";
 import VCupertino from "v-cupertino";
 import { CupertinoPane } from "cupertino-pane";
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 export default defineComponent ({
   name: "CreateTask",
@@ -51,10 +53,12 @@ export default defineComponent ({
     IonItem,
     IonInput,
     IonButton,
-    IonPicker
+    IonPicker,
+    IonLoading
   },
   data() {
     return {
+      loading: false,
       dPicker: false,
       pPicker: false,
       displayedDuration: null,
@@ -175,10 +179,22 @@ export default defineComponent ({
   },
   methods: {
     async callCreateTask() {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+      this.loading = true;
       const { createTask } = api();
 
-      await createTask(this.payload)
-      this.destroyDrawer()
+      await createTask(this.payload).then(() => {
+        this.destroyDrawer();
+        this.loading = false;
+      })
+      this.displayedDuration = null;
+      this.payload = {
+        title: null,
+            priority: null,
+            duration: null
+      }
+
+
     },
 
     async durationPicker() {
@@ -203,7 +219,7 @@ export default defineComponent ({
 
     const destroyDrawer = () => {
       const cupertino = bottomSheet.value.cupertino as CupertinoPane;
-      cupertino.moveToBreak("middle");
+      cupertino.moveToBreak("bottom");
     }
 
     const showDrawer = () => {
@@ -221,7 +237,8 @@ export default defineComponent ({
       buttonClose: false,
       bottomClose: false,
       lowerThanBottom: false,
-      initialBreak: "middle",
+      clickBottomOpen: true,
+      initialBreak: "bottom",
       breaks: {
         top: {
           enabled: true,
@@ -229,42 +246,15 @@ export default defineComponent ({
           bounce: true
         },
         middle: {
+          enabled: false
+        },
+        bottom: {
           enabled: true,
           height: 200,
           bounce: true
-        },
-        bottom: {
-          enabled: false
         }
       }
     }
-
-    // const options = {
-    //   topperOverflow: true,
-    //   draggableOver: true,
-    //   preventClicks: false,
-    //   preventScroll: true,
-    //   topperOverflowOffset: 40,
-    //   buttonClose: false,
-    //   bottomClose: false,
-    //   lowerThanBottom: false,
-    //   initialBreak: "middle",
-    //   breaks: {
-    //     top: {
-    //       enabled: true,
-    //       height: 680,
-    //       bounce: true
-    //     },
-    //     middle: {
-    //       enabled: true,
-    //       height: 200,
-    //       bounce: true
-    //     },
-    //     bottom: {
-    //       enabled: false
-    //     }
-    //   }
-    // }
 
     return {
       options,

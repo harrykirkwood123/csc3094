@@ -180,6 +180,21 @@ export default function api() {
         }
     }
 
+    const setGoal = async (payload) => {
+        const auth = getAuth(app);
+        const token = await getIdToken(auth.currentUser)
+
+        try {
+            await axios.post(host + '/tasks/setgoal/', payload, {headers:
+                    { authorization: `Bearer ${token}` }}).then(async (r) => {
+                await responseHandler(r, "Goal Updated")
+            })
+        }
+        catch (e) {
+            await errorHandler(e)
+        }
+    }
+
 
     return {
         signUp,
@@ -190,6 +205,7 @@ export default function api() {
         setStartTime,
         removeStartTime,
         markCompleted,
-        getCurrentUser
+        getCurrentUser,
+        setGoal
     }
 }

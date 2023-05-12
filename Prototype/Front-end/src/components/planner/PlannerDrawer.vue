@@ -16,17 +16,17 @@
                :move="checkFull">
       <template #item="{ element }">
         <ion-card v-if="element.startTime == null && element.completed !== true">
-          <ion-card-content>
+          <ion-card-content style="padding-inline-end: 8px">
             <ion-grid>
               <ion-row>
-                <ion-col size="auto">
+                <ion-col size="2">
                   <ion-avatar :class="{'priority-high': element.priority === 'High', 'priority-medium': element.priority === 'Medium', 'priority-low': element.priority === 'Low'}"></ion-avatar>
                 </ion-col>
-                <ion-col>
-                  <h1>{{ element.title }}</h1>
+                <ion-col style="padding-left: 20px">
+                  <h1 style="font-size: 1.1rem; text-align: left; padding-top: 13px">{{ element.title }}</h1>
                 </ion-col>
                 <ion-col size="auto" class="right-align">
-                  <ion-card-title color="primary" style="font-size: 25px">{{ duration(element.duration) }}</ion-card-title>
+                  <ion-card-title color="primary" style="font-size: 1.6rem;">{{ duration(element.duration) }}</ion-card-title>
                 </ion-col>
               </ion-row>
             </ion-grid>
@@ -46,6 +46,7 @@ import { getAuth } from 'firebase/auth'
 import draggable from "vuedraggable";
 import { IonCard, IonCardTitle, IonCardContent, IonGrid, IonCol, IonRow, IonAvatar } from "@ionic/vue";
 import {trashBin} from "ionicons/icons";
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 const db = useFirestore()
 const auth = getAuth()
@@ -90,6 +91,7 @@ export default defineComponent ({
   },
   methods: {
     checkFull: function(evt) {
+      Haptics.impact({ style: ImpactStyle.Light });
       return (evt.relatedContext.list.length !== 1)
     },
 
@@ -149,7 +151,7 @@ export default defineComponent ({
           bounce: true
         },
         bottom: {
-          enabled: false
+          enabled: false,
         }
       }
     }
@@ -197,33 +199,37 @@ export default defineComponent ({
   min-width: 300px;
 }
 
-.flip-list-move {
-  transition: transform 0.5s;
-}
-
-.no-move {
-  transition: transform 0s;
-}
-
 .ghostdrop {
   background-color: #f5f6f9;
   opacity: 0.5;
 }
 
-/*.ghostdrop {*/
-/*  background-color: #f5f6f9;*/
-/*}*/
-
 .priority-high {
   background: #F76868;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .priority-medium {
   background: #F7C068;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .priority-low {
   background: #02C39A;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.right-align {
+  text-align: right;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 </style>

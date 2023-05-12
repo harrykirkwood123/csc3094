@@ -22,6 +22,7 @@ import TaskListItem from "@/components/tasks/TaskListItem.vue";
 import {collection} from "firebase/firestore";
 import { useFirestore } from 'vuefire'
 import { getAuth } from 'firebase/auth'
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 const db = useFirestore()
 const auth = getAuth()
@@ -84,8 +85,9 @@ export default defineComponent ({
   setup( ) {
     const createTaskRef = ref()
 
-    function showBottomSheet() {
-     createTaskRef.value.showDrawer();
+    async function showBottomSheet() {
+      await Haptics.impact({ style: ImpactStyle.Medium });
+      createTaskRef.value.showDrawer();
     }
 
     return {

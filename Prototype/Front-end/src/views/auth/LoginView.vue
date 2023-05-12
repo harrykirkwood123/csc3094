@@ -35,7 +35,7 @@ import { defineComponent, reactive } from 'vue'
 import { useIonRouter } from '@ionic/vue';
 import { IonPage, IonContent, IonInput, IonItem, IonButton, IonFooter, loadingController } from '@ionic/vue';
 import api from "@/api/api";
-// import { login } from "@/hooks/firebase-auth";
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 export default defineComponent ({
   name: "LoginView",
@@ -50,6 +50,7 @@ export default defineComponent ({
     })
 
     const doLogin = async () => {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
       const { login } = api();
 
       const loading = await loadingController
@@ -72,7 +73,7 @@ export default defineComponent ({
 
     // Route the user to the signup page
     const signUp = async () => {
-      // await router.replace("/signup")
+      await Haptics.impact({ style: ImpactStyle.Heavy });
     }
 
     return {

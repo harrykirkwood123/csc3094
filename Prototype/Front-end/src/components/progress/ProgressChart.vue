@@ -1,13 +1,15 @@
 <template>
   <div>
     <h1>tasks completed: <span class="total-tasks"> {{ tasksTotal }} </span></h1>
-    <Bar
-        id="progress-chart"
-        :options="chartOptions"
-        :data="taskProgress"
+    <div style="max-height: 350px; display: flex; justify-content: center; align-items: center;">
+      <Bar
+          id="progress-chart"
+          :options="chartOptions"
+          :data="taskProgress"
 
-        v-if="tasks"
-    />
+          v-if="tasks"
+      />
+    </div>
   </div>
 </template>
 
@@ -46,7 +48,7 @@ export default defineComponent ({
       },
       chartOptions: {
         responsive: true,
-        aspectRatio: 1,
+        aspectRatio: 1.1,
         scales: {
           x: {
             border: {
@@ -79,7 +81,12 @@ export default defineComponent ({
           }
         },
         layout: {
-          padding: 20
+          padding: {
+            left: 20,
+            right: 20,
+            top: 10,
+            bottom: 0
+          }
         }
       }
     }

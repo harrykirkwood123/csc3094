@@ -31,6 +31,7 @@ import { defineComponent, ref } from "vue";
 import { IonCard, IonCardTitle, IonCardContent, IonGrid, IonCol, IonRow, IonAvatar, IonIcon, IonPopover, IonList, IonItem } from "@ionic/vue";
 import { checkmark } from "ionicons/icons";
 import { useRouter } from "vue-router";
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import api from "@/api/api";
 
 export default defineComponent ({
@@ -66,10 +67,12 @@ export default defineComponent ({
     },
 
     async viewTimer(task) {
+      await Haptics.impact({ style: ImpactStyle.Light });
       this.$emit('viewTimer', task)
     },
 
     async markTaskCompleted(task) {
+      await Haptics.impact({ style: ImpactStyle.Medium });
       const { markCompleted } = api();
 
       this.spin = true;
@@ -78,12 +81,15 @@ export default defineComponent ({
         setTimeout(async () => {
           await markCompleted({
             id: task.id
+          }).then(() => {
+            this.$destroy;
           });
-        }, 500);
-      }, 700);
+        }, 100);
+      }, 500);
     },
 
     async callDeleteTask(task) {
+      await Haptics.impact({ style: ImpactStyle.Light });
       const { deleteTask } = api();
 
       await deleteTask({
@@ -145,7 +151,7 @@ export default defineComponent ({
 }
 
 .spin-once {
-  animation: spin 0.7s ease-in-out;
+  animation: spin 0.5s ease-in-out;
 }
 
 @keyframes slide-off {

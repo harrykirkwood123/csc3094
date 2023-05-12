@@ -49,6 +49,7 @@
         <ion-fab-button>
           <draggable
               tag="ion-icon"
+              class="ignore-elements"
               v-model="removed"
               group="tasks"
               item-key="id"
@@ -93,6 +94,7 @@ import {collection, onSnapshot, query} from "firebase/firestore";
 import {useFirestore} from "vuefire";
 import {getAuth} from "firebase/auth";
 import api from "@/api/api";
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 const db = useFirestore()
 const auth = getAuth()
@@ -147,6 +149,8 @@ export default defineComponent( {
         group: "tasks",
         disabled: false,
         ghostClass: "ghostdrop",
+        swapThreshold: 5,
+        emptyInsertThreshold: 0,
       };
     },
 
@@ -154,7 +158,7 @@ export default defineComponent( {
       return {
         animation: 200,
         group: "tasks",
-        disabled: false
+        disabled: false,
       };
     }
   },
@@ -195,6 +199,7 @@ export default defineComponent( {
     },
 
     async callRemoveStartTime(task) {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
       const { removeStartTime } = api()
       this.active = false;
 
@@ -257,19 +262,19 @@ export default defineComponent( {
     },
 
     checkFull: function(evt) {
+
       this.active = false;
-      if (evt.relatedContext.component.componentData) {
-        if (evt.relatedContext.component.componentData.name === "flip-list") {
-          return false
-        } else if (evt.relatedContext.component.componentData.id === "trash") {
-          this.active = true;
-          return true
-        }
-      } else if ((evt.relatedContext.list.length !== 1)) {
-        return true
-      } else {
-        return false
-      }
+
+     if (evt.relatedContext.list.length < 1) {
+       if (evt.relatedContext.component.componentData && evt.relatedContext.component.componentData.id === "trash") {
+         Haptics.impact({ style: ImpactStyle.Light });
+         this.active = true;
+         return true
+       }
+       Haptics.impact({ style: ImpactStyle.Light });
+       return true
+     }
+     return false;
     },
 
     formatTimeFromSeconds(timeInSeconds) {
@@ -475,7 +480,7 @@ export default defineComponent( {
 }
 
 .list-group {
-  min-height: 50px;
+  min-height: 75px;
   min-width: 300px;
 }
 

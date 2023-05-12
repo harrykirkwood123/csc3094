@@ -42,7 +42,7 @@
           <timer-tab :task="data.task"></timer-tab>
         </swiper-slide>
         <swiper-slide>
-          <settings-tab></settings-tab>
+          <settings-tab @lock-slide="lockSlide" @unlock-slide="unlockSlide"></settings-tab>
         </swiper-slide>
       </swiper>
     </ion-content>
@@ -141,7 +141,7 @@ export default defineComponent( {
     }
 
     return {
-      modules: [Pagination, IonicSlides],
+      modules: [Pagination],
       readerOutline,
       timerOutline,
       cogOutline,

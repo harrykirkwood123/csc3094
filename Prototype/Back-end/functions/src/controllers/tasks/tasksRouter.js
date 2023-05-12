@@ -12,5 +12,6 @@ tasks_router.post('/tasks/createtask', authenticate_token, tasksApiController['c
 tasks_router.post('/tasks/deletetask', authenticate_token, tasksApiController['deleteTask']);
 tasks_router.post('/tasks/edittask', authenticate_token, tasksApiController['editTask']);
 tasks_router.post('/tasks/markcompleted', authenticate_token, tasksApiController['markCompleted']);
+tasks_router.post('/tasks/setgoal', authenticate_token, tasksApiController['setGoal']);
 
 module.exports = tasks_router;

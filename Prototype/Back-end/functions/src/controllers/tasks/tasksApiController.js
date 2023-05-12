@@ -2,6 +2,7 @@ const createTaskApi = require('../../api/tasks/createTask');
 const deleteTaskApi = require('../../api/tasks/deleteTask');
 const editTaskApi = require('../../api/tasks/editTask');
 const markCompletedApi = require('../../api/tasks/markCompleted');
+const setGoalApi = require('../../api/tasks/setGoal')
 
 class TasksApiController {
     createTask(req, res) {
@@ -36,6 +37,16 @@ class TasksApiController {
 
     markCompleted(req, res) {
         markCompletedApi(req.body, req.authId)
+            .then(uid => {
+                res.status(200).send(uid)
+            })
+            .catch(err => {
+                res.status(400).send(err)
+            })
+    }
+
+    setGoal(req, res) {
+        setGoalApi(req.body, req.authId)
             .then(uid => {
                 res.status(200).send(uid)
             })
