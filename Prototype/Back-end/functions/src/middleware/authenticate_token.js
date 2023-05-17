@@ -27,7 +27,6 @@ module.exports = (req, res, next) => {
             const { authToken } = req;
             await admin.auth().verifyIdToken(authToken).then((decodedToken) => {
                 const uid = decodedToken.uid;
-                console.log(uid)
                 req.authId = uid
             })
             return next();

@@ -1,4 +1,4 @@
-const { getFirestore, collection, addDoc, doc } = require("firebase/firestore");
+const { getFirestore, collection, addDoc } = require("firebase/firestore");
 const { firebase } = require("firebase/app")
 
 const db = getFirestore(firebase);
@@ -11,7 +11,6 @@ async function createTask(task, uid) {
             title: task.title,
             duration: parseInt(task.duration),
             priority: task.priority,
-            progress: 0,
             completed: false
         });
     } catch (error) {

@@ -41,15 +41,10 @@
 import { defineComponent, ref, Ref } from "vue";
 import VCupertino from "v-cupertino";
 import { CupertinoPane } from "cupertino-pane";
-import { useFirestore } from 'vuefire'
-import { getAuth } from 'firebase/auth'
 import draggable from "vuedraggable";
 import { IonCard, IonCardTitle, IonCardContent, IonGrid, IonCol, IonRow, IonAvatar } from "@ionic/vue";
 import {trashBin} from "ionicons/icons";
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-
-const db = useFirestore()
-const auth = getAuth()
 
 export default defineComponent ({
   name: "PlannerDrawer",
@@ -93,12 +88,6 @@ export default defineComponent ({
     checkFull: function(evt) {
       Haptics.impact({ style: ImpactStyle.Light });
       return (evt.relatedContext.list.length !== 1)
-    },
-
-    getComponentData() {
-      return {
-        name: 'drawer'
-      }
     },
 
     duration: function (duration) {

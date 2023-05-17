@@ -48,11 +48,7 @@ export default defineComponent ({
     }
   },
   setup() {
-
     const router = useRouter();
-
-
-
     const signOut = async () => {
       const loading = await loadingController
           .create({
@@ -78,7 +74,3 @@ export default defineComponent ({
   }
 })
 </script>
-
-<style scoped>
-
-</style>

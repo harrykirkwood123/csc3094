@@ -2,17 +2,6 @@
   <ion-page>
     <ion-content scroll-y="false">
       <TimerComponent :task="task"></TimerComponent>
-<!--      <ion-grid>-->
-<!--        <ion-row class="ion-justify-content-center">-->
-<!--          <ion-col>-->
-<!--          </ion-col>-->
-<!--          <ion-col>-->
-
-<!--          </ion-col>-->
-<!--          <ion-col>-->
-<!--          </ion-col>-->
-<!--        </ion-row>-->
-<!--      </ion-grid>-->
     </ion-content>
   </ion-page>
 </template>
@@ -28,15 +17,8 @@ export default defineComponent ({
   },
   components: {
     IonPage,
-    // IonGrid,
-    // IonRow,
-    // IonCol,
     IonContent,
     TimerComponent
   }
 })
 </script>
-
-<style scoped>
-
-</style>

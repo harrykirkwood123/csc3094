@@ -14,7 +14,7 @@ async function createAccount(newUser) {
         });
 
         await setDoc(doc(db, "UserPreferences", cred.user.uid), {
-            darkMode: false
+            goal: 40
         });
     } catch (error) {
         throw new Error(error);

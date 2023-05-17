@@ -4,9 +4,8 @@ const db = getFirestore();
 
 async function setStartTime(task, uid) {
     try {
-        const tasksDocRef = doc(db, "Tasks", uid);
-        const tasksColRef = collection(tasksDocRef, "Tasks")
-        await setDoc(doc(tasksColRef, task.id), {
+        const tasksDbRef = collection(db, "Tasks", uid, "Tasks")
+        await setDoc(doc(tasksDbRef, task.id), {
             startTime: task.startTime
         }, {
             merge: true

@@ -7,18 +7,16 @@ import FIREBASE_CONFIG from "@/firebaseConfig";
 import { initializeApp } from "firebase/app";
 
 // Declaring the port and host address
-const port = 8000
-// const host = "http://127.0.0.1:" + port
 const host = "https://adhd-prototype.web.app"
 
-const app = initializeApp(FIREBASE_CONFIG);
+export const firebaseApp = initializeApp(FIREBASE_CONFIG);
 
 if (Capacitor.isNativePlatform) {
-    initializeAuth(app, {
+    initializeAuth(firebaseApp, {
         persistence: indexedDBLocalPersistence
     });
 }
-export const auth = getAuth(app);
+export const auth = getAuth(firebaseApp);
 
 // Declaring the api module
 export default function api() {
@@ -35,7 +33,8 @@ export default function api() {
         return toast.present();
     }
 
-    // Response handler used to display toast message if api call is successful / if there is an error
+    // Response handler used to display toast message
+    // if api call is successful / if there is an error
     const responseHandler = async (r, okay) => {
         if (r.status === 200) {
             const toast = await toastController
@@ -47,6 +46,8 @@ export default function api() {
                 })
             return toast.present();
         } else {
+            // If response has no status or the
+            // response handler encounters an error
             const toast = await toastController
                 .create({
                     message: "Oops an error has occurred!",
@@ -69,11 +70,13 @@ export default function api() {
 
     // login method uses firebase to sign in with the provided email & password
     const login = async (payload) => {
-       const auth = getAuth(app);
+       const auth = getAuth(firebaseApp);
         try {
-            await signInWithEmailAndPassword(auth, payload.email, payload.password).then(async r => {
-                r["status"] = 200
-                await responseHandler(r,"Logged in successfully")
+            await signInWithEmailAndPassword(auth,
+                payload.email,
+                payload.password).then(async r => {
+                    r["status"] = 200
+                    await responseHandler(r,"Logged in successfully")
             })
         }
         catch (e) {
@@ -83,7 +86,7 @@ export default function api() {
     }
 
     const logout = async () => {
-        const auth = getAuth(app);
+        const auth = getAuth(firebaseApp);
         try {
             await signOut(auth).then(async () => {
                 const r = {};
@@ -110,11 +113,12 @@ export default function api() {
     }
 
     const createTask = async (payload) => {
-        const auth = getAuth(app);
-        const token = await getIdToken(auth.currentUser)
+        const auth = getAuth(firebaseApp);
+        const token = await getIdToken(auth.currentUser);
+        const url = host + '/tasks/createtask/';
 
         try {
-            await axios.post(host + '/tasks/createtask/', payload, {headers:
+            await axios.post(url, payload, {headers:
                     { authorization: `Bearer ${token}` }}).then(async (r) => {
                 await responseHandler(r, "Task Created")
             })
@@ -125,7 +129,7 @@ export default function api() {
     }
 
     const deleteTask = async (payload) => {
-        const auth = getAuth(app);
+        const auth = getAuth(firebaseApp);
         const token = await getIdToken(auth.currentUser)
 
         try {
@@ -140,7 +144,7 @@ export default function api() {
     }
 
     const setStartTime = async (payload) => {
-        const auth = getAuth(app);
+        const auth = getAuth(firebaseApp);
         const token = await getIdToken(auth.currentUser)
 
         try {
@@ -153,7 +157,7 @@ export default function api() {
     }
 
     const removeStartTime = async (payload) => {
-        const auth = getAuth(app);
+        const auth = getAuth(firebaseApp);
         const token = await getIdToken(auth.currentUser)
 
         try {
@@ -166,7 +170,7 @@ export default function api() {
     }
 
     const markCompleted = async (payload) => {
-        const auth = getAuth(app);
+        const auth = getAuth(firebaseApp);
         const token = await getIdToken(auth.currentUser)
 
         try {
@@ -181,7 +185,7 @@ export default function api() {
     }
 
     const setGoal = async (payload) => {
-        const auth = getAuth(app);
+        const auth = getAuth(firebaseApp);
         const token = await getIdToken(auth.currentUser)
 
         try {

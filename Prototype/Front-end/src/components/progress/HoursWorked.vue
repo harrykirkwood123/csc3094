@@ -1,6 +1,6 @@
 <template>
   <div style="padding-bottom: 30px;">
-    <ve-progress v-if="tasks" thickness="10%" color="#00A896" :progress="calculateProgress" :size="250" animation="loop" font-size="2rem">
+    <ve-progress v-if="tasks" thickness="10%" color="#00A896" :progress="calculateProgress" :size="250" animation="loop" font-size="1.6rem">
       <span slot="legend-value">{{ calculateHours }} / {{ preferences.goal }}</span><br>
       <span slot="legend-value">hours</span>
     </ve-progress>
@@ -43,8 +43,6 @@ export default defineComponent ({
     },
 
     calculateProgress() {
-      // let percentage = 0
-
       return (this.calculateHours / this.preferences.goal) * 100;
     }
   }

@@ -5,26 +5,35 @@
         <img src="../../assets/Logo.png" class="logo">
       </div>
       <div class="container ion-padding-horizontal" style="top: 50%;">
-<!--        <ion-item>-->
-<!--          <ion-input label="email" type="email" v-model="payload.email"></ion-input>-->
-<!--        </ion-item>-->
         <ion-item fill="outline" mode="md" style="min-width: 80%; padding-bottom: 20px;">
           <ion-input label="email" label-placement="floating" placeholder="email" v-model="payload.email"></ion-input>
         </ion-item>
-<!--        <ion-item>-->
-<!--          <ion-input label="password" type="password" v-model="payload.password"></ion-input>-->
-<!--        </ion-item>-->
         <ion-item fill="outline" mode="md" style="min-width: 80%; padding-bottom: 20px;">
-          <ion-input label="password" type="password" label-placement="floating" placeholder="password" v-model="payload.password"></ion-input>
+          <ion-input label="password"
+                     type="password"
+                     label-placement="floating"
+                     placeholder="password"
+                     v-model="payload.password">
+          </ion-input>
         </ion-item>
       </div>
     </ion-content>
 
     <ion-footer class="ion-no-border ion-padding-bottom" translucent="true">
       <div>
-        <ion-button expand="block" class="ion-padding-horizontal" size="large" style="color: white; --border-radius: 20px; font-size: 25px;" @click="doLogin">login</ion-button>
+        <ion-button expand="block"
+                    class="ion-padding-horizontal"
+                    size="large"
+                    style="color: white; --border-radius: 20px; font-size: 25px;"
+                    @click="doLogin">login
+        </ion-button>
         <br>
-        <ion-button expand="block" class="ion-padding-horizontal" size="large" style="color: white; --border-radius: 20px; font-size: 25px; --background: #02C39A;" @click="signUp()">create account</ion-button>
+        <ion-button expand="block"
+                    class="ion-padding-horizontal"
+                    size="large"
+                    style="color: white; --border-radius: 20px; font-size: 25px; --background: #02C39A;"
+                    @click="signUp()">create account
+        </ion-button>
       </div>
     </ion-footer>
   </ion-page>
@@ -40,8 +49,6 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 export default defineComponent ({
   name: "LoginView",
   setup() {
-    // const { login } = api();
-
     const ionRouter = useIonRouter();
 
     const payload = reactive({

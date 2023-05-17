@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import {VueFire, VueFireAuth, VueFireFirestoreOptionsAPI } from 'vuefire'
-import { firebaseApp } from './firebaseInit'
+import { firebaseApp } from './api/api'
 
 import { IonicVue } from '@ionic/vue';
 
@@ -34,11 +34,9 @@ import "primevue/resources/primevue.min.css";
 /* Theme variables */
 import './theme/variables.css';
 
-// import useFirebaseAuth from "./hooks/firebase-auth";
 import veProgress from "vue-ellipse-progress"
 import PrimeVue from 'primevue/config';
 
-// const { authCheck  } = useFirebaseAuth();
 
 const app = createApp(App)
     .use(IonicVue)
@@ -56,21 +54,3 @@ const app = createApp(App)
 router.isReady().then(() => {
     app.mount('#app');
 });
-
-// authCheck()
-//     .then(() => {
-//         app.use(router)
-//         app.use(veProgress)
-//         app.use(PrimeVue)
-//         app.use(VueFire, {
-//             firebaseApp,
-//             modules: [
-//               VueFireAuth(),
-//               VueFireFirestoreOptionsAPI(),
-//             ],
-//         })
-//         return router.isReady();
-//     })
-//     .then(() => {
-//       app.mount("#app");
-//     });

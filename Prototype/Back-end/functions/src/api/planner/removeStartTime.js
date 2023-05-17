@@ -4,16 +4,14 @@ const db = getFirestore();
 
 async function removeStartTime(task, uid) {
     try {
-        const tasksDocRef = doc(db, "Tasks", uid);
-        const tasksColRef = collection(tasksDocRef, "Tasks")
-        await setDoc(doc(tasksColRef, task.id), {
+        const tasksDbRef = collection(db, "Tasks", uid, "Tasks")
+        await setDoc(doc(tasksDbRef, task.id), {
             startTime: null
         }, {
             merge: true
         });
 
     } catch (error) {
-        console.log(error);
         throw new Error(error);
     }
 }

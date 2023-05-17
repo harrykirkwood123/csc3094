@@ -15,7 +15,6 @@ async function markCompleted(task, uid) {
         });
 
     } catch (error) {
-        console.log(error);
         throw new Error(error);
     }
 }

@@ -38,9 +38,6 @@
             </draggable>
           </template>
         </Timeline>
-
-
-
       <ion-icon></ion-icon>
 
       <planner-drawer :tasks="tasks"  @disable-drag="disableDrag" @enable-drag="enableDrag" @dragging="$emit('lockSlide')" @not-dragging="$emit('unlockSlide')"></planner-drawer>
@@ -73,20 +70,7 @@
 <script>
 import Timeline from 'primevue/timeline';
 import {defineComponent} from "vue";
-import {
-  IonAvatar,
-  IonCard,
-  IonCardContent,
-  IonCardTitle,
-  IonCol,
-  IonContent,
-  IonGrid,
-  IonPage,
-  IonRow,
-  IonFab,
-  IonFabButton,
-  IonIcon
-} from "@ionic/vue";
+import { IonAvatar, IonCard, IonCardContent, IonCardTitle, IonCol, IonContent, IonGrid, IonPage, IonRow, IonFab, IonFabButton, IonIcon } from "@ionic/vue";
 import PlannerDrawer from "@/components/planner/PlannerDrawer.vue";
 import { trashBin } from 'ionicons/icons';
 import draggable from "vuedraggable";
@@ -109,10 +93,7 @@ export default defineComponent( {
       fab: false,
       active: false,
       times: [],
-      hideDrawer: false,
       tasks: [],
-      planner: [],
-      setOccupied: false,
       populated: false,
       removed: [],
       draggable: true
@@ -164,14 +145,12 @@ export default defineComponent( {
   },
   methods: {
     dragging() {
-      console.log("dragging")
       this.draggable = false
       this.fab = true;
       this.$emit('lockSlide');
     },
 
     notDragging() {
-      console.log("not dragging")
       this.draggable = true
       this.fab = false;
       this.$emit('unlockSlide');
@@ -307,14 +286,6 @@ export default defineComponent( {
       return formattedDuration;
     },
 
-    setOccupyTrue: function(task) {
-      if (this.setOccupied !== true) {
-        this.times[task.index].occupied = false;
-        this.setOccupied = true;
-        return true
-      }
-    },
-
     handleDrag: function(task) {
       const newTimes = this.createEmptyTimesArray();
 
@@ -424,6 +395,7 @@ export default defineComponent( {
         }
       }
     },
+
     async fetchDocuments() {
       const collectionRef = collection(db, 'Tasks', auth.currentUser.uid, 'Tasks');
       const q = query(collectionRef);
@@ -484,14 +456,6 @@ export default defineComponent( {
   min-width: 300px;
 }
 
-.flip-list-move {
-  transition: transform 0.5s;
-}
-
-.no-move {
-  transition: transform 0.5s;
-}
-
 :deep(.p-timeline) {
   padding-bottom: 250px;
   padding-top: 20px;
@@ -508,8 +472,6 @@ export default defineComponent( {
   flex-shrink: 1;
   flex-basis: 65px;
 }
-
-
 
 :deep(.p-timeline.p-timeline-vertical .p-timeline-event-opposite) {
   padding: 0 10px 0 0;
@@ -532,6 +494,4 @@ export default defineComponent( {
 .priority-low {
   background: #02C39A;
 }
-
-
 </style>

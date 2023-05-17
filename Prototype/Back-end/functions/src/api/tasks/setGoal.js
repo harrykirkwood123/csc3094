@@ -5,7 +5,6 @@ const db = getFirestore();
 async function setGoal(body, uid) {
     try {
         const preferencesDocRef = doc(db, "UserPreferences", uid);
-        console.log(body)
         await setDoc(preferencesDocRef, {
             goal: body.goal
         }, {
@@ -13,7 +12,6 @@ async function setGoal(body, uid) {
         });
 
     } catch (error) {
-        console.log(error);
         throw new Error(error);
     }
 }

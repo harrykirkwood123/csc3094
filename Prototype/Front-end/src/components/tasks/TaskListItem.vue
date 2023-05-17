@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 import { IonCard, IonCardTitle, IonCardContent, IonGrid, IonCol, IonRow, IonAvatar, IonIcon, IonPopover, IonList, IonItem } from "@ionic/vue";
 import { checkmark } from "ionicons/icons";
 import { useRouter } from "vue-router";
